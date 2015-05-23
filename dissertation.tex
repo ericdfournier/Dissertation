@@ -1,0 +1,42 @@
+%!TEX TS-program = xelatex
+%!TEX encoding = UTF-8 Unicode
+
+\documentclass[School=UCSB]{Dissertate}
+
+\begin{document}
+
+% the front matter
+\input{frontmatter/personalize}
+\maketitle
+\copyrightpage
+\abstractpage
+\tableofcontents
+%\authorlist
+\listoffigures
+\dedicationpage
+\acknowledgments
+
+\doublespacing
+
+% include each chapter
+\setcounter{chapter}{-1} 
+\include{chapters/introduction}
+\include{chapters/chapter1}
+\include{chapters/chapter2}
+\include{chapters/chapter3}
+\include{chapters/chapter4}
+\begin{appendices}
+    \include{chapters/appendixA}
+\end{appendices}
+
+\singlespacing
+
+% the back matter
+\clearpage
+\bibliography{references}
+\addcontentsline{toc}{chapter}{References}
+\bibliographystyle{apalike2}
+
+\include{endmatter/colophon}
+
+\end{document}
