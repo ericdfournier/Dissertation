@@ -32,11 +32,10 @@
 
 \renewcommand{\maketitle}{
 	\thispagestyle{empty}
-	\vspace*{\fill}
-	\vspace{100pt}
+	\vspace{36pt}
 	\begin{center}
 	\Huge \textcolor{SchoolColor}{\thetitle} \normalsize \\
-	\vspace{100pt}
+	\vspace{36pt}
 	\textsc{A Dissertation presented \\ by\\
 	\theauthor\\ to\\ The Bren School of \@department\\
 	\vspace{12pt}
@@ -45,8 +44,22 @@
 	in the subject of\\ \@field\\
 	\vspace{12pt}
 	\@university\\ \@universitycity, \@universitystate\\
-	\@degreemonth\ \@degreeyear}
-	\end{center} \vspace*{\fill}
+	\@degreemonth\ \@degreeyear \\
+	\vspace{12pt}
+    Approved \\ by \\
+    \vspace{12pt}
+	Committee Chair -- Dr. Arturo A. Keller \\
+	\vspace{16pt}
+	\noindent\rule{8cm}{1pt} \\
+    \vspace{12pt}
+	Committee Member -- Dr. James Frew \\
+	\vspace{16pt}
+    \noindent\rule{8cm}{1pt} \\
+    \vspace{12pt}
+    Committee Member -- Dr. Roland Geyer \\
+    \vspace{16pt}
+    \noindent\rule{8cm}{1pt}}
+	\end{center} 
 }
 
 \newcommand{\copyrightpage}{
@@ -65,7 +78,6 @@
 	\pagenumbering{roman}
 	\setcounter{page}{3}
 	\pagestyle{fancy}
-	\lhead{Thesis advisor: Professor \@advisor} \rhead{\@author}
 	\renewcommand{\headrulewidth}{0.0pt}
 	\vspace*{35pt}
 	\begin{center}

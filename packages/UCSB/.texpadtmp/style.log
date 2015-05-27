@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.1415926-2.4-0.9998 (TeX Live 2012) (format=xelatex 2012.6.30)  9 FEB 2015 09:54
+This is XeTeX, Version 3.1415926-2.4-0.9998 (TeX Live 2012) (format=xelatex 2012.6.30)  27 MAY 2015 16:38
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -24,7 +24,7 @@ LaTeX Warning: You have requested package `',
 Package: packages/UCSB/style 
 ./style.sty:4: Undefined control sequence.
 l.4 \university
-               {University of California at Santa Barbara}
+               {University of California Santa Barbara}
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
 misspelled it (e.g., `\hobx'), type `I' and the correct
@@ -39,7 +39,7 @@ Type  H <return>  for immediate help.
  ...                                              
                                                   
 l.4 \university{U
-                 niversity of California at Santa Barbara}
+                 niversity of California Santa Barbara}
 You're in trouble here.  Try typing  <return>  to proceed.
 If that doesn't work, type  X <return>  to quit.
 
@@ -65,8 +65,6 @@ Missing character: There is no r in font nullfont!
 Missing character: There is no n in font nullfont!
 Missing character: There is no i in font nullfont!
 Missing character: There is no a in font nullfont!
-Missing character: There is no a in font nullfont!
-Missing character: There is no t in font nullfont!
 Missing character: There is no S in font nullfont!
 Missing character: There is no a in font nullfont!
 Missing character: There is no n in font nullfont!
@@ -342,7 +340,7 @@ If that doesn't work, type  X <return>  to quit.
  
 Here is how much of TeX's memory you used:
  27 strings out of 494004
- 376 string characters out of 3150890
+ 364 string characters out of 3150890
  48089 words of memory out of 3000000
  3388 multiletter control sequences out of 15000+200000
  3640 words of font info for 14 fonts, out of 3000000 for 9000
