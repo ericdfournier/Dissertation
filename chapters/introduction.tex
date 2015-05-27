@@ -8,11 +8,27 @@ We have arranged a civilization in which most crucial elements profoundly depend
 
 \newpage
 
+\section{Research Objectives}
+
+\newthought{The overarching research objective} of this dissertation can be stated as follows: develop an integrated modeling framework, incorporating data depicting local geographic context, that is capable of quantifying the life-cycle energy-water usage efficiency of proposed new infrastructural systems supporting the reuse of treated municipal wastewater for the purpose of artificial groundwater recharge. In order to achieve this goal the following three canonical problems were identified and addressed in sequential order:
+
+    \begin{enumerate}
+         
+        \item Given multiple independent objectives -- propose a systematic method for selecting sites that are suitable for the development of new artificial groundwater recharge infrastructure.   
+        \item Given multiple independent objectives -- propose a systematic method for routing optimal corridors for new water distribution infrastructure linking a designed treated effluent source to a designated recharge destination.
+        \item Given a fixed influent flow rate, a set of mean influent pollutant concentrations, a set of maximum effluent pollutant concentrations, and the topological structure of the effluent distribution network -- propose a systematic method for determining the life-cycle energy-water usage efficiency of an integrated wastewater reuse system 
+    
+    \end{enumerate}
+    
+The remainder of Chapter (0) provides an in-depth background discussion of the both the academic and social relevance of the stated research objective. Subsequent Chapters (1-3) are organized with respect to the various independent research activities that were undertaken to address each of the three canonical problems listed above. The final Chapter (4) provides an in depth analysis of a set five case study implementations that were developed to assess the framework's efficacy in satisfying the stated research objective. 
+
+\newpage
+
 \section{The Energy-Water Nexus}
   
 \newthought{Nearly all modern industrialized societies} rely upon energy generation technologies which are derivative of a thermodynamic process known as a heat engine. In a typical heat engine the chemical energy stored within a fuel source such as coal, petroleum, or natural gas, must be first be released as ambient thermal energy through the process of combustion. The heat engine then, by virtue of its design, converts this ambient thermal energy into mechanical energy for the purpose of performing some sort of meaningful work -- i.e. generating electricity.
     
-    The history of the advancement of the human species is a story which can be cast in terms of the progressive discovery new, higher density chemical energy stores and their enhanced exploitation via the development of new, ever more sophisticated heat engines. Interestingly however, is the fact that nowhere in our history has there ever occurred a single substantial deviation in the choice of the working fluid that actually performs the conversion of thermal to mechanical energy within all of these heat engines: water. For all of the advances which have been made in terms of improved fuel processing, boiler and combustion chamber design, water has and likely will continue to remain stubbornly positioned as a critical component of nearly all major commercial scale energy systems; and, in particular, those involved with the production of electricity. 
+    The history of the advancement of the human species is a story which can be cast in terms of the progressive discovery new, higher density chemical energy stores and their enhanced exploitation via the development of new, ever more sophisticated heat engines. Interestingly however, is the fact that nowhere in our history has there ever occurred a single substantial deviation in the choice of the working fluid that actually performs the crucial energy conversion process within a heat engine: water. For all of the advances which have been made in terms of improved fuel processing, boiler and combustion chamber design, etc., water has and likely will continue to remain stubbornly positioned as a critical component of nearly all major commercial scale energy systems; and, in particular, those involved with the production of electricity. 
     
     Another technological system which can also be viewed as a foundation pillar of modern industrialized societies is the mechanized disposal of human and animal wastes via engineered sewage conveyance and treatment processes. Here again, the advancement of the human species might alternatively be cast in terms of the progressive improvement in the reliability and efficiency of these systems over time. And, what is more, just as the advancement of our energy system appears to be bounded by the physical properties of the water, so too has the advancement of wastewater management been similarly constrained. 
         
@@ -20,15 +36,15 @@ We have arranged a civilization in which most crucial elements profoundly depend
     
     In terms of water distribution processes, the key physical determinant of energy efficiency stems from the density of water. At 1000 $kg/m^3$, considerable energy must be expended whenever large quantities of water must be moved over a distance or lifted against an elevation gradient. What is more, many treatment processes utilize pressurized sieving techniques where water is physically pushed through a porous membrane in order to mechanically filter out dissolved pollutant species. As a consequence of this practice, the energy inputs required to overcome the previously mentioned entropic gradient are often supplied for the immediate purpose of moving quantities of water from place to place.
     
-     \begin{figure}[Perspectives on the Energy-Water Nexus]
+     \begin{figure}[!h]
        \centering
        \includegraphics[width=4.5in]{figures/energy-water-nexus-perspectives.png}
        \caption[Perspectives on the Energy-Water Nexus]{Perspectives on the Energy-Water Nexus}
        \label{fig:energy-water-perspectives}
      \end{figure}
      
-    The energy-water nexus is a term which has emerged from within the academic research community to describe these types of dynamic interrelationships which are inherent to our energy and water systems. There are two perspectives from which the energy-water nexus can be alternatively studied. The first emphasizes the \textit{water for energy} dimension, and is generally concerned with the study of processes and technologies that are involved with the direct withdrawal and consumption of water for the production of both primary and final energy resources. The second of these perspectives, and the one which shall be adopted for the purposes of this proposal, focuses instead on the \textit{energy for water} dimension; investigating processes and technologies which consume energy for the purpose of transmitting or purifying freshwater resources.     
-     \begin{figure}[Dimensions of the Energy-Water Nexus]
+    The energy-water nexus is a term which has emerged from within the academic research community to describe these types of dynamic interrelationships which are inherent to our energy and water systems. There are two perspectives from which the energy-water nexus can be alternatively studied. The first emphasizes the \textit{water for energy} dimension, and is generally concerned with the study of processes and technologies that are involved with the direct withdrawal and consumption of water for the production of both primary and final energy resources. The second of these perspectives, focuses alternatively on the \textit{energy for water} dimension; investigating processes and technologies which consume energy for the purpose of transmitting or purifying freshwater resources.     
+     \begin{figure}[!h]
        \centering
        \includegraphics[width=5.5in]{figures/energy-water-nexus-dimensions.png}
        \caption[Dimensions of the Energy-Water Nexus]{The dimensions of the energy-water nexus}
@@ -42,17 +58,17 @@ The criticality of the energy-water nexus becomes greatly exacerbated in those a
 \section{Water Distribution Systems}
     
 One of the main drivers for of this tremendous energy consumption within the state of California is the large scale transfer of freshwater resources between physically distinct hydrologic basins. California is crossed latitudinally by a massive network of interconnected hydraulic engineering projects including pipelines, aqueducts, reservoirs, and pump stations. These systems, which have been funded by a mixture of Federal, State, and Local agencies, were designed to reconcile discontinuities between the spatial and temporal distributions of the supply and demand for freshwater resources within the state.
-    
-Inter-basin transfers typically involve the movement of water against a considerable elevation gradient. Due to water's previously mentioned high density, there are substantial energetic costs associated with operating the infrastructure required to facilitate these transfers. For example, the bar graph to the right of Figure \ref{fig:infrastructure-energy-intensity} compares the energy intensity of several different sources of municipal water within the state of California. According to this research water resources which are supplied via inter-basin transfer, either through branches of the State Water Project or through the Colorado River Aqueduct, rank very poorly in terms of energy usage efficiency relative to a number of other water supply systems.
-    
-       \begin{figure}[The geographic extent of water distribution infrastructure in the state California]
+
+       \begin{figure}[!h]
        \centering
        \includegraphics[width=5.5in]{figures/infrastructure.png}
        \caption[Characteristics of Water Distribution Infrastructure]{The geographic extent of water distribution infrastructure in the state of California}
-       \label{fig:infrastructure-energy-intensity}
+       \label{fig:california-distribution}
      \end{figure}
     
-     \begin{figure}[The energy intensity of water distribution infrastructure in the state California]
+Inter-basin transfers typically involve the movement of water against a considerable elevation gradient. Due to water's previously mentioned high density, there are substantial energetic costs associated with operating the infrastructure required to facilitate these transfers. For example, the bar graph to the right of Figure \ref{fig:infrastructure-energy-intensity} compares the energy intensity of several different sources of municipal water within the state of California. According to this research water resources which are supplied via inter-basin transfer, either through branches of the State Water Project or through the Colorado River Aqueduct, rank very poorly in terms of energy usage efficiency relative to a number of other water supply systems.
+
+     \begin{figure}[!h]
        \centering
        \includegraphics[width=5.5in]{figures/energy-intensity.png}
        \caption[Energy Intensity of Water Distribution Infrastructure]{The geographic extent of water distribution infrastructure in the state California}
@@ -61,32 +77,40 @@ Inter-basin transfers typically involve the movement of water against a consider
      
 \section{Wastewater Treatment}
 
-The term \textit{wastewater treatment} refers to a process of removing physical, chemical, or biological contaminants from a quantity of water such that their concentrations are sufficiently low for that quantity of water to be deemed fit for use in some specified application. Crucially implicit in this definition therefore, is the notion that the treatment methods, and any associated support systems involved, will vary on the basis of the purity requirements associated with the anticipated water end-use type. Figure provides a process flow diagram which demonstrates, in generic terms, the various phases of wastewater treatment and some of the methods/systems that are commonly used at each phase. Adjacent to this, on the right, is a list of common water end use types organized on the basis of the minimum degree of required pretreatment.
+The term \textit{wastewater treatment} refers to a set of physical and chemical processes that have been individually designed and are collectively composed for the purpose of removing a suite of physical, chemical, and/or biological contaminants from a quantity of water. The operational goal of a wastewater treatment process is typically defined in terms of a set of desired effluent pollutant concentrations that are sufficiently low to enable that effluent to be used for a specific end-use application. Crucially implicit in this definition therefore, is the notion that the precise combination and configuration of the individual, atomic treatment processes, will vary on the basis of the purity requirements associated with the anticipated end-use application. Figure \ref{fig:process-flow-diagram} provides a high level view of the separate treatment processes that are typical to modern wastewater treatment facilities; assigning them to a somewhat informal hierarchy consisting of: primary treatment, secondary treatment, and tertiary treatment.
 
-       \begin{figure}[Water consumed per unit power production for various electricity generation technologies]
+The collection of processes described in Figure \ref{fig:process-flow-diagram} represent the required suite of treatment operations necessary to produce effluent water that is suitable for groundwater recharge applications (indirect potable reuse) given a normal stream of influent municipal wastewater. Typically, wastewater treatment plants (WWTPs) -- ones that are producing treated effluent for release into natural waters -- are only required to provide up to a secondary treatment level; which, on this diagram, corresponds to the fourth row of processes from the top. As the figure shows, providing treated effluent for reuse applications necessitates the implementation of as many a seven additional layers of tertiary treatment in order to manage issues such as suspended colloids, disinfection, and phosphorous removal.
+     
+     \begin{figure}[!h]
+       \centering
+       \includegraphics[width=4in]{figures/process-flow.png}
+       \caption[Process Flow Diagram of Wastewater Treatment Methods]{Process flow diagram of various wastewater treatment methods}
+       \label{fig:process-flow-diagram}
+     \end{figure}
+
+This hierarchy of treatment processes depicted in \ref{fig:process-flow-diagram} is only meant to be representative of the types of processes that are typically required for reuse applications. In reality however, neither the rigid segregation of treatment processes nor the association of each treatment level with a set of designated end-uses have been precisely codified into a coherent regulatory framework at the Federal level. In general, primary and secondary treatment are Federally mandated as part of the generic WWTP under provisions of the Clean Water Act. However, tertiary treatment processes and requirements for their application in the context of different desired end-use applications, are, at present, regulated at the state or local levels in a more ad-hoc manner. Figure \ref{fig:use-categories} attempts to illustrate the complexity of this landscape by mapping treatment levels to different end-use types, with annotations where additional restrictions may apply.
+
+     \begin{figure}[!h]
+       \centering
+       \includegraphics[width=5.5in]{figures/use-categories.png}
+       \caption[End Use Categories for Recycled Water]{End Use Categories for Recycled Water}
+       \label{fig:use-categories}
+     \end{figure}
+     
+\section{Wastewater Recycling and Reuse}
+    
+Over the past ten years the reuse of treated wastewater has become the fastest growing source of new water supply for municipal water districts in the Western United States. There are a variety of reasons for this growth. Some districts enjoy the degree of self determinism that a reuse system affords them; particularly in cases where they are beholden to a the whims of a third party water wholesale provider or are ham stringed by more senior water rights holders elsewhere within their basin. In general however, the primary driving force behind this growth trend has been the fact that treated municipal wastewater is perceived to be an energy efficient water supply alternative for a number of low quality uses.
+
+If one looks at current reuse systems, this assumption appears to be safe. This is because the vast majority of these systems are structured such that the destination location for the treated effluent is situated in close proximity to the WWTP. An illustrative example of such a situation might be the use of wastewater which had been subjected to basic secondary treatment for the irrigation of a nearby cemetery or golf course. These types of reuse systems can be thought of as "low hanging fruit" because the only additional energy process based energy expenditures associated with their operation come from whatever tertiary treatment processes must be added into the WWTP operations to meet the effluent purity requirements associated with the designated end-use. 
+
+More recently however, many municipalities have begun to actively investigate the possibility of expanding the both the scale and extent of their reuse operations: capturing larger fractions of their WWTP plants' throughput and distributing the treated effluent to a more diverse portfolio of end-use recipients.  
+              
+ \section{The Energy-Water Feedback Loop}
+ 
+        \begin{figure}[!h]
        \centering
        \includegraphics[width=5.5in]{figures/water_consumption_for_energy.png}
        \caption[Water Intensity of Energy Production]{The water consumption intensity, measured in terms of water consumed per unit power produced, for various electricity generation technologies}
        \label{fig:water-consumption-intensity}
         \end{figure}
-    
-\section{Wastewater Recycling and Reuse}
-    
-The fastest growing source of new water supply for municipal water districts in the Western United States is treated municipal wastewater. A major driver behind this trend has been the fact that treated municipal wastewater is perceived to be an energy efficient water supply option for a number of low quality uses, particularly when the end-use location is situated in close proximity to the wastewater treatment plant (WWTP). An illustrative example of such a condition might be the use of wastewater which had been subjected to basic secondary treatment for the irrigation of a nearby cemetery or golf course.
-    
-     \begin{figure}[Process flow diagram of various wastewater treatment methods]
-       \centering
-       \includegraphics[width=3in]{figures/process-flow.png}
-       \caption[Process Flow Diagram of Wastewater Treatment Methods]{Process flow diagram of various wastewater treatment methods}
-       \label{fig:process-flow-diagram}
-     \end{figure}
-    
-     \begin{figure}[End Use Categories for Recycled Water]
-       \centering
-       \includegraphics[width=5.5in]{figures/use-categories.png}
-       \caption[End Use Categories for Recycled Water]{End Use Categories for Recycled Water}
-       \label{fig:use-categories}
-     \end{figure}        
-              
- \section{Quantifying Life Cycle Energy-Water Usage Efficiency}
 

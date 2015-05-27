@@ -157,7 +157,7 @@ The orientation vector is interpreted as the mean of the bivariate Gaussian $PDF
 
 In an effort to make this pseudo-random walk procedure more comprehensible, particularly with regards to the parameterization of the bivariate Gaussian PDF $f(\textbf{x}_u)$, an example implementation is provided in Figure 4. On the far left of Figure 4 the current status of an arbitrary pseudo-random walk is shown midway through completion. Also drawn, as a broken line, is an abstract representation of the Euclidean shortest path $\textbf{I}^*$ connecting the source location ${}^{s}x$ to the destination location ${}^{d}x$. Show at bottom is the current value of the distance parameter $d_n \approx 7.1$. Just to the right of this, in the zoom inset area, the current valid connected set $\textbf{V}_n$ is drawn with the previously visited indices $(\textbf{x}_n ,\textbf{x}_{n-1})$ greyed out to illustrate their elimination from consideration as valid next steps in the walk process. Also shown in this inset are the row column unit vector deltas $\Delta\textbf{x}_u$ associated with movement to each of the seven nodes contained within the current valid connected set. The small arrow pointing downwards and to the right depicts the current state of the orientation vector $\boldsymbol\mu_n$ which describes the position of the destination location ${}^{d}\textbf{x}$ relative to the current walk location $\textbf{x}_n$. The current value of this vector $(\boldsymbol\mu_n = [1,1])$ can be thought of as indicating the row and column deltas associated the next step possible step most directly leading towards the destination.
             
-            \begin{figure}[Pseudo-Random Walk Example]
+            \begin{figure}[!h]
             \centering
             \includegraphics[width=5.5in]{figures/pseudo-random-walk-example.png}
             \caption[Pseudo-Random Walk Example]{Pseudo-Random Walk Example}
@@ -176,7 +176,7 @@ Historically, corridor location problems which have been posed in the context of
 
 One strategy which can be employed to ensure enough genetic diversity is produced within the initial seed population without having to generate populations of unduly large size or populations with individuals characterized by a high degree of randomness, is the generation of so called multi-part pseudo random walks. This procedure can be thought of as somewhat analogous to orthogonal statistical sampling techniques such as Latin Hypercube sampling which are used to generate samples from a non-uniformly distributed population by first dividing it into equally probable subspaces (McKay et al 1979, Ye 1998). The implicit assumption here being that the fitness distribution of all possible corridors connecting a typical source and destination pair is similarly non-uniform.
             
-            \begin{figure}[Conceptual Illustration of a Multi-Part Pseudo-Random Walk]
+            \begin{figure}[!h]
             \centering
             \includegraphics[width=5.5in]{figures/multi-part-pseudo-random-walk-example.png}
             \caption[Conceptual Illustration of a Multi-Part Pseudo-Random Walk]{Conceptual Illustration of a Multi-Part Pseudo-Random Walk}
@@ -191,7 +191,7 @@ Another circumstance which has the potential to dramatically effect the performa
 
 An approach which has been developed to address such cases is the so called concave multi-part pseudo random walk. It is similar to the standard multi-part walk in that the final walk is composed of a collection of pseudo-random walk sections. However, it differs from the standard walk procedure in that rather than partitioning the space on the basis of distance bands, it iteratively divides the decision space into a series of convex subregions. Here again, these convex sub region contain the centroids associated with connected regions of low objective variable values. The procedure is illustrated conceptually by the sequence of panels contained in Figure 6.
             
-            \begin{figure}[Conceptual Illustration of a Convex Multi-Part Pseudo-Random Walk]
+            \begin{figure}[!h]
             \centering
             \includegraphics[width=5.5in]{figures/convex-multi-part-pseudo-random-walk-example.png}
             \caption[Conceptual Illustration of a Convex Multi-Part Pseudo-Random Walk]{Conceptual Illustration of a Convex Multi-Part Pseudo-Random Walk}
@@ -237,4 +237,4 @@ One of the considerations previously discussed related to the initialization of 
             
 The runtime reductions which can be achieved from the use of the multi-part pseudo random walk procedure will principally occur in the context of relatively high value settings for the fixed parameter $q$. This is because while the various component segments of a multi-part walk may not deviate significantly from the Euclidean shortest path however, the randomized connection of multiple such segments produces composite individuals that are significantly more diverse.
             
-\section{MOGADOR Outputs}
+\section{MOGADOR Algorithm Outputs}
