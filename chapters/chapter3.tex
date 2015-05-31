@@ -59,4 +59,73 @@ provides a schematic overview of the WWEST database model components and their r
     
 The WWEST LCI database can be accessed in two ways. The first, which provides full access to all of the attribute fields contained within the database, is via an excel spreadsheet that has been distributed with a built-in set of computational macros. The second method exposes a more limited range of the data values contained within the database and is accessible via a streamlined web application, also known as WWESTweb. The principle difference between the WWEST excel model and the web application is in the extent to which each allows the user to customize the various parameters associated with a hypothetic water reuse project and its supporting infrastructure. In this sense, the excel based model is more appropriate for building an LCI model to quantify the process flows attributable to an existing facility or which is in a very advanced stage of design planning. Conversely, the WWESTweb framework is more appropriate for less well defined scenario based planning exercises, where the primary goal is to assess the relative impact of major system design alternatives that have only roughly been fleshed out.
 
-\section{WWEST Model Outputs}
+\section{Parameterizing the WWEST Model} 
+
+The WWEST model requires a number of key input parameters to be supplied by the user before it can be run. These parameters correspond to various attributes of the proposed reuse system including: pipe length and material information derived from the distribution network topology, estimates of distribution process energy consumption figures, and process based chemical inputs associated with any required tertiary treatment phases.
+
+In order to facilitate the systematic parameterization of the WWEST model a programmatic workflow was developed which automates the calculation of a number of parameters from two input data sources: (1) the topology of the distribution network (i.e. the corridor solution from the MOGADOR optimization model) and (2) the expected daily flow rate derived from the maximum permitted flow value assigned to each WWTP facility through the NPDES permitting program. 
+
+To illustrate how this workflow functions, take for example the process of calculating the expected energy requirements associated with the distribution of the treated wastewater from its source at that WWTP to its destination at the reuse facility. Estimating the instantaneous power output associated with the operation of a pipeline based water distribution system begins with Equation \ref{eq:pumpEnergy}.
+
+      \begin{equation}
+          P = \frac{Q * H_t * g * \rho}{E}
+          \label{eq:pumpEnergy}
+      \end{equation}
+      
+       \noindent \textit{Where:} \hfill
+
+       \begin{center}
+           $P = $ The instantaneous pump energy $(W)$ \\
+           $Q = $ The flow rate $(m^{3}/s)$\\
+           $H_{t} = $ The total head $(m)$ \\
+           $g = $ The gravitational constant $(m/s^{2})$ \\
+           $\rho = $ The density of the fluid $(Kg/m^3)$ \\
+           $E = $ The pump efficiency factor $(unitless)$ \\
+       \end{center}
+
+The first terms in this expression $(Q$ can be computed by dividing the annual volume of processes by the WWTP by the number of seconds in a year. The second term $(H_t)$, can be computed summing the static and dynamic head components of the system as in the following Equations \ref{eq:staticHead} and \ref{eq:dynamicHead}, while the last three terms $(g,\rho, \& E)$ are constants that are characteristic to the system.
+
+       \begin{equation}
+          H_s = e_{i} - e_{o}  
+          \label{eq:staticHead}
+       \end{equation}
+      
+       \noindent \textit{Where:} \hfill
+
+       \begin{center}
+           $H_s = $ Static head component \\
+           $e_i = $ Elevation at pipeline inlet \\
+           $e_o = $ Elevation at pipeline output \\
+       \end{center}
+
+Equation \ref{eq:staticHead} describes how the static head can be computed as the difference between the elevations at the inlet and the outlet locations for the pipeline. When the corridor specification is known, this difference can easily be computed automatically by referencing the first and last subscript indices of the corridor to a raster based digital elevation model.
+
+Computing the dynamic component $(H_d)$ of the total system head is a significantly more complicated process; however, it can, nonetheless, be similarly automated if one possesses detailed knowledge about the pipeline corridor specification and the underlying digital elevation model. Equation \ref{eq:dynamicHead} illustrates the way in which dynamic head $(H_d)$ can be computed. 
+
+       \begin{equation}
+          H_d = \frac{K_{t} * v^2}{2g}
+          \label{eq:dynamicHead}
+       \end{equation}
+       
+       \noindent \textit{Where:} \hfill
+
+       \begin{equation}
+           K_{t} = K_{p} + K_{f}
+           \label{eq:totalLosses}
+       \end{equation}
+       
+       \begin{equation}
+           v = \frac{Q}{A}
+           \label{eq:velocity}
+       \end{equation}
+       
+       \begin{equation}
+           K_{p} = \frac{f * L}{D}
+           \label{eq:pipeLosses}
+       \end{equation}
+       
+       \begin{equation}
+           f = \frac{0.25}{ \left\{ \log_{10}{ \frac{k}{3.75 * D} + \frac{5.74}{Re^{0.9}} } \right\}^{2} }
+           \label{eq:frictionCoefficient}
+       \end{equation}
+

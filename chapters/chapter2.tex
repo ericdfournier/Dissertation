@@ -18,13 +18,15 @@ At this stage it is important to pause to consider whether or not the constructi
             
 \section{The Multi-Objective Corridor Location Problem}
             
-The multi-objective corridor location problem can be formally written as Equation 1 \cite{Zhou2011}. The problem involves the simultaneous minimization of the sums of $w$ independent objective functions $\hat{O}_w$ evaluated at the set of discrete locations $\textbf{x}_n$ comprising a corridor of length $n$. A valid corridor $\textbf{x}_n$ is subject to the constraint that all of its nodes must be contained with the feasible search domain $\boldsymbol{\Omega}$. Additional, optional constraints which are often imposed upon the structure of $\textbf{x}_n$ shall be discussed in greater detail in subsequent sections.
+The multi-objective corridor location problem can be formally written as Equation \ref{eq:minFnc} \cite{Zhou2011}. The problem involves the simultaneous minimization of the sums of $w$ independent objective functions $\hat{O}_w$ evaluated at the set of discrete locations $\textbf{x}_n$ comprising a corridor of length $n$. A valid corridor $\textbf{x}_n$ is subject to the constraint that all of its nodes must be contained with the feasible search domain $\boldsymbol{\Omega}$. Additional, optional constraints, as in Equation \ref{eq:constraints}, are often imposed upon the structure of $\textbf{x}_n$ and shall be discussed in greater detail in subsequent sections.
             
             \begin{equation}
-            Minimize: \prod\limits_{n=1}^n \left\{\hat{O}_1(\textbf{x}_n), \dots, \hat{O}_w(\textbf{x}_n)\right\} 
+            Minimize: \prod\limits_{n=1}^n \left\{\hat{O}_1(\textbf{x}_n), \dots, \hat{O}_w(\textbf{x}_n)\right\}
+            \label{eq:minFnc}
             \end{equation}
             \begin{equation}
             S.t.: \textbf{x}_n \in \boldsymbol\Omega
+            \label{eq:constraints}
             \end{equation}
             
             \noindent \textit{Where:} \hfill
@@ -95,10 +97,11 @@ The optimal data structure for use in concert with the MOGADOR algorithm is a ne
 
 \section{Initializing the MOGADOR Algorithm}
     
-A novel population initialization procedure has been developed for use in conjunction with the MOGADOR algorithm which improves the global quality of the output solution set while simultaneously reducing overall computational effort. At its core, this novel pseudo-random walk algorithm works by repeatedly sampling a dynamically parameterized bivariate Gaussian distribution. The generic form of the probability density function for the bivariate Gaussian distribution can be written as Equation 2 (Johnson et al 2002). Here, the bivariate Gaussian PDF $f(\boldsymbol{\tau})$ is function of two inputs. [1] The first is a mean vector $\boldsymbol{\mu}$, comprised of the means $(\mu_1, \mu_2)$ of two continuous random variables $(\tau_1, \tau_2)$. [2] The second is a covariance matrix $\boldsymbol{\Sigma}$, comprised of the pairwise covariances $\sigma$ for all possible combinations of the continuous random variables $(\tau_1, \tau_2)$.
+A novel population initialization procedure has been developed for use in conjunction with the MOGADOR algorithm which improves the global quality of the output solution set while simultaneously reducing overall computational effort. At its core, this novel pseudo-random walk algorithm works by repeatedly sampling a dynamically parameterized bivariate Gaussian distribution. The generic form of the probability density function for the bivariate Gaussian distribution can be written as Equation \ref{eq:bivariateNormalPDF} (Johnson et al 2002). Here, the bivariate Gaussian PDF $f(\boldsymbol{\tau})$ is function of two inputs. [1] The first is a mean vector $\boldsymbol{\mu}$, comprised of the means $(\mu_1, \mu_2)$ of two continuous random variables $(\tau_1, \tau_2)$. [2] The second is a covariance matrix $\boldsymbol{\Sigma}$, comprised of the pairwise covariances $\sigma$ for all possible combinations of the continuous random variables $(\tau_1, \tau_2)$.
             
             \begin{equation}
             f(\boldsymbol{\tau}) = \frac{1}{ \sqrt{ (2\pi)^2 \mid \boldsymbol{\Sigma} \mid} } e^{ \frac{-1}{2} ( \boldsymbol{\tau} - \boldsymbol{\mu} )^T \boldsymbol{ \Sigma}^{-1} ( \boldsymbol{\tau} - \boldsymbol{\mu} ) }
+            \label{eq:bivariateNormalPDF}
             \end{equation}
 
             \noindent \textit{Where:} \hfill
