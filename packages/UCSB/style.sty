@@ -32,37 +32,57 @@
 
 \renewcommand{\maketitle}{
 	\thispagestyle{empty}
-	\vspace{30pt}
+    \vspace*{\fill}
+	%\vspace{100pt}
 	\begin{center}
+	\textsc{\@university\\ \@universitycity, \@universitystate\\
+	\@degreemonth\ \@degreeyear \\}
+	\vspace{72pt}
 	\Huge \textcolor{SchoolColor}{\thetitle} \normalsize \\
-	\vspace{30pt}
+	\vspace{72pt}
 	\textsc{A Dissertation presented \\ by\\
 	\theauthor\\ to\\ The Bren School of \@department\\
-	\vspace{12pt}
-	in partial fulfillment of the requirements\\
-	for the degree of\\ \@degree\\
-	in the subject of\\ \@field\\
-	\vspace{12pt}
-	\@university\\ \@universitycity, \@universitystate\\
-	\@degreemonth\ \@degreeyear \\
-	\vspace{30pt}
-    Approved \\ by \\
-	Committee Chair -- Dr. Arturo A. Keller \\
-	\vspace{16pt}
-	\noindent\rule{8cm}{1pt} \\
-    \vspace{12pt}
-	Committee Member -- Dr. James Frew \\
-	\vspace{16pt}
-    \noindent\rule{8cm}{1pt} \\
-    \vspace{12pt}
-    Committee Member -- Dr. Roland Geyer \\
-    \vspace{16pt}
-    \noindent\rule{8cm}{1pt}}
+	\vspace{24pt}
+	in partial fulfillment of the requirements for the degree \\
+    of \\ \@degree\\
+    \vspace{24pt}
+	in the subject \\ 
+	of \\ \@field\\}
+	\vspace*{\fill}
 	\end{center} 
+}
+
+\newcommand{\signaturepage}{
+	\newpage
+	\thispagestyle{empty}
+    \vspace*{\fill}
+    \vspace{30pt}
+    \begin{center}
+    \textsc{This Dissertation is Approved \\ by \\
+    \vspace{24pt}
+	Committee Chair \\
+	\vspace{16pt}
+	Signature:\noindent\rule{8cm}{1pt} Date: \noindent\rule{2cm}{1pt} \\
+	Dr. Arturo A. Keller \\
+    \vspace{24pt}
+	Committee Member \\
+	\vspace{16pt}
+    Signature: \noindent\rule{8cm}{1pt} Date: \noindent\rule{2cm}{1pt} \\
+    Dr. James Frew \\
+    \vspace{24pt}
+    Committee Member \\
+    \vspace{16pt}
+    Signature: \noindent\rule{8cm}{1pt} Date: \noindent\rule{2cm}{1pt} \\
+    Dr. Roland Geyer \\}
+    \vspace*{\fill}
+	\end{center} 
+	\rm
 }
 
 \newcommand{\copyrightpage}{
 	\newpage
+    \pagenumbering{roman}
+	\setcounter{page}{3}
 	\thispagestyle{empty}
 	\vspace*{\fill}
 	\scshape \noindent \small \copyright \small 2015\hspace{3pt}-- \theauthor \\
@@ -72,10 +92,61 @@
 	\rm
 }
 
+\newcommand{\dedicationpage}{
+	\newpage 
+	\pagenumbering{roman}
+	\thispagestyle{empty} \vspace*{\fill}
+	\scshape \noindent \input{frontmatter/dedication}
+	\vspace*{\fill} 
+	\newpage 
+	\rm
+}
+
+\newcommand{\vitaepage}{
+    \newpage
+    \pagenumbering{roman}
+    \thispagestyle{empty} 
+    \begin{center}
+    \Large \textcolor{SchoolColor}{Curriculum Vitae of Eric Daniel Fournier} \\
+    \normalsize June 2015 \\
+    \end{center}
+    \vspace*{12pt}
+    \Large \textcolor{SchoolColor}{Education} \\
+    \vspace*{12pt}
+    \normalsize
+    Bachelor of Science in Environmental Science, Bucknell University, Lewisburg, PA, June 2008, (Magna Cum Laude, Phi Beta Kappa) \\
+    Master of Environmental Science, Yale School of Forestry and Environmental Science, New Haven, CT, June 2010 \\
+    Master of Arts in Geography, University of California Santa Barbara, Santa Barbara, CA, March 2015 \\
+    \vspace*{12pt}
+    \Large \textcolor{SchoolColor}{Employment} \\
+    \vspace*{12pt}
+    \normalsize
+    2009-2010: Teaching Assistant, Geographic Information Science, Yale School of Forestry and Environmental Science, New Haven, CT \\
+    2010-2013: Teaching Assistant, Biogeochemistry, Landscape Ecology, Geographic Information Science, University of California at Santa Barbara, Santa Barbara, CA \\
+    \vspace*{12pt}
+    \Large \textcolor{SchoolColor}{Publications} \\
+    \vspace*{12pt}
+    \normalsize
+    Automating the Preprocessing of Heterogeneous Spatial Data Inputs to Multi-Criteria Site Suitability Analyses, \textit{Environmental Software and Modeling}, Submitted 2015. \\
+    MOGADOR revisited: improving a genetic approach to multi-objective corridor search, \textit{Journal of Environmental Planning and Design }B, 2015. \\
+    Minimizing impacts of land use change on ecosystem services using multi-criteria heuristic analysis, \textit{Journal of Environmental Management}, 2015. \\
+    Spectroscopic investigations of $Fe.^{2+}$ complexation on nontronite clay, \textit{Langmuir}, 2007. \\
+    \vspace{12pt}
+    \Large \textcolor{SchoolColor}{Fellowships} \\
+    \vspace*{12pt}
+    \normalsize
+    Walton Family Foundation Sustainable Water Markets Fellow, Toyota Motor Company Doctoral Fellow, Forestry Scholarship, McKenna Foundation Research Fellow \\
+    \vspace*{12pt}
+    \Large \textcolor{SchoolColor}{Specializations} \\
+    \vspace*{12pt}
+    \normalsize
+    GIS, Spatial LCA, Genetic Algorithms, Stochastic Combinatoric Optimization
+    \rm
+}
+
 \newcommand{\abstractpage}{
 	\newpage
-	\pagenumbering{roman}
-	\setcounter{page}{3}
+    \pagenumbering{roman}
 	\pagestyle{fancy}
 	\renewcommand{\headrulewidth}{0.0pt}
 	\vspace*{35pt}
@@ -88,12 +159,6 @@
 	\vspace*{\fill}
 	\newpage \lhead{} \rhead{}
 	\cfoot{\thepage}
-}
-
-\newcommand{\dedicationpage}{
-	\newpage \thispagestyle{fancy} \vspace*{\fill}
-	\scshape \noindent \input{frontmatter/dedication}
-	\vspace*{\fill} \newpage \rm
 }
 
 \newcommand{\acknowledgments}{
