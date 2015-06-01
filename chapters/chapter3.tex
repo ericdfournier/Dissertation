@@ -59,7 +59,7 @@ provides a schematic overview of the WWEST database model components and their r
     
 The WWEST LCI database can be accessed in two ways. The first, which provides full access to all of the attribute fields contained within the database, is via an excel spreadsheet that has been distributed with a built-in set of computational macros. The second method exposes a more limited range of the data values contained within the database and is accessible via a streamlined web application, also known as WWESTweb. The principle difference between the WWEST excel model and the web application is in the extent to which each allows the user to customize the various parameters associated with a hypothetic water reuse project and its supporting infrastructure. In this sense, the excel based model is more appropriate for building an LCI model to quantify the process flows attributable to an existing facility or which is in a very advanced stage of design planning. Conversely, the WWESTweb framework is more appropriate for less well defined scenario based planning exercises, where the primary goal is to assess the relative impact of major system design alternatives that have only roughly been fleshed out.
 
-\section{Parameterizing the WWEST Model} 
+\section{Parameterizing Pump Energy Requirements} 
 
 The WWEST model requires a number of key input parameters to be supplied by the user before it can be run. These parameters correspond to various attributes of the proposed reuse system including: pipe length and material information derived from the distribution network topology, estimates of distribution process energy consumption figures, and process based chemical inputs associated with any required tertiary treatment phases.
 
@@ -76,14 +76,14 @@ To illustrate how this workflow functions, take for example the process of calcu
 
        \begin{center}
            $P = $ The instantaneous pump energy $(W)$ \\
-           $Q = $ The flow rate $(m^{3}/s)$\\
+           $Q = $ The instantaneous flow rate $(m^{3}/s)$\\
            $H_{t} = $ The total head $(m)$ \\
            $g = $ The gravitational constant $(m/s^{2})$ \\
            $\rho = $ The density of the fluid $(Kg/m^3)$ \\
            $E = $ The pump efficiency factor $(unitless)$ \\
        \end{center}
 
-The first terms in this expression $(Q$ can be computed by dividing the annual volume of processes by the WWTP by the number of seconds in a year. The second term $(H_t)$, can be computed summing the static and dynamic head components of the system as in the following Equations \ref{eq:staticHead} and \ref{eq:dynamicHead}, while the last three terms $(g,\rho, \& E)$ are constants that are characteristic to the system.
+The first term in this expression $(Q)$, the instantaneous flow rate, can be computed by dividing the annual volume of processes by the WWTP by the number of seconds in a year. The second term $(H_t)$, the total system head, can be computed summing the individual static and dynamic head components as in the following Equations \ref{eq:staticHead} and \ref{eq:dynamicHead}. The last three terms $(g,\rho, \& E)$ are constants that are characteristic to the system.
 
        \begin{equation}
           H_s = e_{i} - e_{o}  
@@ -93,39 +93,113 @@ The first terms in this expression $(Q$ can be computed by dividing the annual v
        \noindent \textit{Where:} \hfill
 
        \begin{center}
-           $H_s = $ Static head component \\
-           $e_i = $ Elevation at pipeline inlet \\
-           $e_o = $ Elevation at pipeline output \\
+           $H_s = $ The static head component \\
+           $e_i = $ The elevation at pipeline inlet \\
+           $e_o = $ The levation at pipeline output \\
        \end{center}
 
-Equation \ref{eq:staticHead} describes how the static head can be computed as the difference between the elevations at the inlet and the outlet locations for the pipeline. When the corridor specification is known, this difference can easily be computed automatically by referencing the first and last subscript indices of the corridor to a raster based digital elevation model.
+Equation \ref{eq:staticHead} describes how the static head can be computed as the difference between the elevations at the inlet and the outlet locations for the pipeline. When the corridor specification is known, this difference can be straightforwardly assessed by referencing the first and last subscript indices of the corridor to a raster based digital elevation model.
 
-Computing the dynamic component $(H_d)$ of the total system head is a significantly more complicated process; however, it can, nonetheless, be similarly automated if one possesses detailed knowledge about the pipeline corridor specification and the underlying digital elevation model. Equation \ref{eq:dynamicHead} illustrates the way in which dynamic head $(H_d)$ can be computed. 
+Computing the dynamic component $(H_d)$ of the total system head is a significantly more complicated process; however, it can, nonetheless, be similarly automated from the same detailed knowledge regarding the pipeline corridor specification and its underlying elevation profile. Equations \ref{eq:dynamicHead} through \ref{eq:frictionCoefficient} illustrate the sequence of operations by which dynamic head $(H_d)$ can be computed. 
 
        \begin{equation}
-          H_d = \frac{K_{t} * v^2}{2g}
+          H_d = \frac{K_{t} * V^2}{2g}
           \label{eq:dynamicHead}
        \end{equation}
        
        \noindent \textit{Where:} \hfill
+       
+       \begin{center}
+           $H_d = $ The dynamic head component \\
+           $K_t = $ The total system losses \\
+           $V = $ The flow velocity \\
+       \end{center}
+       
+The dynamic head term is a representation of the frictional forces that arise from the movement of water through the pipeline. These cumulative effective of these forces are represented by the term $(K_t)$, total losses, and are multiplied by the square of the velocity at which the water is flowing. The $(K_t)$ can be parsed into two separate components, $(K_p \& K_f)$, as shown in Equation \ref{eq:totalLosses}. These two terms represent the relative contribution of the friction associated with the movement of water over the textured surface of the pipeline interior walls and the friction associated with the movement of water through a tortuous pipeline that has various connective fittings such as elbow joints and flow control valves. 
 
        \begin{equation}
            K_{t} = K_{p} + K_{f}
            \label{eq:totalLosses}
        \end{equation}
        
+       \noindent \textit{Where:} \hfill
+       
+       \begin{center}
+           $K_p = $ The pipe loss component $(unitless)$ \\
+           $K_f = $ The fitting loss component $(unitless)$ \\
+       \end{center}       
+       
+Typically, the velocity term $(V)$ is computed from the product of a specific flow rate $(Q)$ and pipeline cross sectional area $(A)$ as in Equation \ref{eq:velocity}. However, in the case of this analysis, the pipeline cross sectional area was solved for by specifying a maximum permissible flow velocity $V_{max} = (10 m/s)$ relative to some designated flow rate.
+       
        \begin{equation}
-           v = \frac{Q}{A}
+           V = \frac{Q}{A}
            \label{eq:velocity}
        \end{equation}
+       
+       \noindent \textit{Where:} \hfill
+       
+       \begin{center}
+           $A = $ The cross sectional area of the pipe $(m^2)$\\
+       \end{center}      
+       
+The component of the total losses attributable to the cumulative friction encounter along the pipeline's pipe section walls $(K_p)$ can be calculated from Equation \ref{eq:pipeLosses} as the product of a friction coefficient $(f)$ and the pipeline length $(L)$ divided by the diameter of the pipeline pipe sections $(D)$.
        
        \begin{equation}
            K_{p} = \frac{f * L}{D}
            \label{eq:pipeLosses}
        \end{equation}
        
+       \noindent \textit{Where:} \hfill
+       
+       \begin{center}
+           $f = $ The friction coefficient of the pipe $(unitless)$ \\
+           $L = $ The cumulative length of all the pipe sections $(m)$ \\
+           $D = $ The diameter of each pipe section $(m)$ \\
+       \end{center}   
+       
+The friction component $(f)$ of the pipeline loss term $(K_p)$ can be computed from the empirically derived Equation \ref{eq:frictionCoefficient} where $(k)$ is a roughness factor that is characteristic to the pipe section material construction and $(Re)$ is the Reynolds number which is a dimensionless quantity that this associated to the smoothness with which a fluid flows and can be derived from the fluid's characteristic kinematic viscosity $(\upsilon)$ as in Equation \ref{eq:reynolds}.
+       
        \begin{equation}
            f = \frac{0.25}{ \left\{ \log_{10}{ \frac{k}{3.75 * D} + \frac{5.74}{Re^{0.9}} } \right\}^{2} }
            \label{eq:frictionCoefficient}
        \end{equation}
+       
+       \noindent \textit{Where:} \hfill
+       
+       \begin{center}
+           $k = $ The roughness factor of the pipe material $(m)$ \\
+           $Re = $ The Reynolds Number of the fluid $(unitless)$ \\
+       \end{center}   
+       
+       \begin{equation}
+           Re = \frac{V * D}{\upsilon}
+           \label{eq:reynolds}
+       \end{equation}
+       
+       \noindent \textit{Where:} \hfill
+       
+       \begin{center}
+           $\upsilon = $ The kinematic viscosity of the fluid $(m^2/s)$ \\
+       \end{center}   
+       
+The fitting losses $(K_f)$, which makes up the second component of the total losses expression $(K_t)$ and which ultimately feeds into the calculation of dynamic head $(H_d)$, can be computed by using the corridor specification to cumulatively assess the need for various fitting components to facilitate pipeline deviations and flow control systems. The contribution of each fitting component to the total $(K_f)$ factor is empirically defined and can be iterative summing the contribution of each fitting $(K_n)$, multiplied by its appropriate fitting loss factor $(K'_n)$, along the entire length of the pipeline corridor as in Equation \ref{eq:fittingLossComponents}.
+
+        \begin{equation}
+            K_f = \sum\limits_{i=1}^n \left\{ (K_1 * K'_1) + \dots + (K_n * K'_n) \right\}
+            \label{eq:fittingLossComponents}
+        \end{equation}
+    
+       \noindent \textit{Where:} \hfill
+       
+       \begin{center}
+           $K_n = $ The individual fitting loss component $(unitless)$ \\
+           $K_n = $ The individual fitting loss factor $(unitless)$ \\
+       \end{center}
+       
+\section{Parameterizing Chemical Consumption Rates} 
+
+Once, the pump energy associated with the corridor specification has been computed according to Equations \ref{eq:pumpEnergy} - \ref{eq:fittingLossComponents} there are two key sets of input parameters which remain that must be provided to the WWEST model. The first of these has to do with the volume of reinforced concrete that must be poured to facilitate the construction of the requisite infrastructural components of the proposed reuse system. The second are the volumes of any consumable chemical substances that must be provided to facilitate the tertiary treatment processes associated with the reuse system specification.
+
+\section{Parameterizing Construction Material Requirements}
+
 
