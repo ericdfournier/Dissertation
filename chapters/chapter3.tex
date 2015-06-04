@@ -10,7 +10,7 @@ Either the rest of the world can't live like the developed world or we need, as 
 
 \section{Quantifying Life-Cycle Energy-Water Resource Usage Efficiency}
 
-The third major challenge associated with this dissertation's stated research objective was the development of a systematic method for quantifying the life-cycle energy-water resource utilization efficiency of water reuse systems involving significant artificial groundwater recharge components. For this purpose, the decision was made to build upon a substantial body of previous research in this area by utilizing an existing life-cycle inventory (LCI) database comprising energy and material process flow data collected from a large sample of existing WWTP operations and reuse facilities \cite{Stokes2006, Stokes2011, Stokes2014}. The novel contribution of this dissertation to this body of work appears in a new set of methods which have been developed for the dynamic parameterization of the LCI model from geographic details and regional context of the proposed reuse project being evaluated. 
+The third major challenge associated with this dissertation's stated research objective involves the development of a systematic method for quantifying the life-cycle energy-water resource utilization efficiency of water reuse systems involving significant artificial groundwater recharge components. For this purpose, the decision was made to build upon a substantial body of previous research on this subject by utilizing an existing life-cycle inventory (LCI) database comprising energy and material process flow data collected from a large sample of existing WWTP operations and reuse facilities \cite{Stokes2006, Stokes2011, Stokes2014}. The novel contribution of this dissertation to this body of work appears in the form of a new set of methods for the programmatic parameterization of the LCI model based upon the geographic context and spatial layout of the proposed reuse project under evaluation. 
 
 For example, by first determining suitable sites for recharge infrastructure and then elucidating near-optimal corridors for the distribution network supplying the treated wastewater from the WWTP, the research analyst is then able to gain a deeper and more fundamental understanding of the systems behaviors. For example, with a detailed corridor specification in hand, it then becomes possible to estimate process energy demands of the system from first principles rather than having to use vague reference data aggregated from a wide distribution of empirical measurements \cite{Klein2005}. As we shall demonstrate in subsequent sections, these new capabilities go a long way towards improving both the accuracy and the precision of the model's outputs.
 
@@ -46,7 +46,7 @@ The requirement that treated wastewater, regardless of its standard of treatment
  
 \section{WWEST Recycled Water Reuse Life Cycle Inventory Model}
 
-The WWEST Recycled Water Reuse Life-cycle Inventory Model refers to an integrated life-cycle inventory database and modeling framework for understanding the environmental impacts of wastewater treatment and reuse processes that was developed by a team of academic researchers operating out of the University of California at Berkeley College of Engineering. The principal investigator behind the project is Dr. Arpad Horvath, Professor of Civil and Environmental Engineering, and a specialist in the environmental impact assessment of civil infrastructure systems. The lead researcher on the WWEST project is Dr. Jennifer Stokes, with the initial development work on the WWEST model being completed as part of her doctoral dissertation project.
+The WWEST Recycled Water Reuse Life-cycle Inventory Model refers to an integrated life-cycle inventory database and modeling framework for understanding the environmental impacts of wastewater treatment and reuse processes that was developed by a team of academic researchers operating out of the University of California at Berkeley College of Engineering \cite{Stokes2010}. The principal investigators behind the project are Doctor Arpad Horvath, Professor of Civil and Environmental Engineering, and Doctor Jennifer Stokes. Doctor Stokes completed the initial development work for the WWEST model as part of her doctoral dissertation research in the area of environmental impact assessment of civil infrastructure systems.
 
 The LCI database underlying the WWEST toolset contains process flow information for the manufacture and operation of equipment and facilities involved in the supply, treatment, and distribution of municipal wastewater for the purpose of non-potable reuse. \ref{fig:WWESTsystem} 
 provides a schematic overview of the WWEST database model components and their respective input data sources.
@@ -67,7 +67,7 @@ The WWEST model requires a number of key input parameters to be supplied by the 
 
 In order to facilitate the systematic parameterization of the WWEST model a programmatic workflow was developed which automates the calculation of a number of parameters from two input data sources: (1) the topology of the distribution network (i.e. the corridor solution from the MOGADOR optimization model) and (2) the expected daily flow rate derived from the maximum permitted flow value assigned to each WWTP facility through the NPDES permitting program. 
 
-To illustrate how this workflow functions, take for example the process of calculating the expected energy requirements associated with the distribution of the treated wastewater from its source at that WWTP to its destination at the reuse facility. Estimating the instantaneous power output associated with the operation of a pipeline based water distribution system begins with Equation \ref{eq:pumpEnergy}.
+To illustrate how this workflow functions, take for example the process of calculating the expected energy requirements associated with the distribution of the treated wastewater from its source at that WWTP to its destination at the reuse facility. Estimating the instantaneous power output associated with the operation of a pipeline based water distribution system begins with Equation \ref{eq:pumpEnergy}\cite{Liu2003}.
 
       \begin{equation}
           P = \frac{Q * H_t * g * \rho}{E}
@@ -85,7 +85,7 @@ To illustrate how this workflow functions, take for example the process of calcu
            $E = $ The pump efficiency factor $(unitless)$ \\
        \end{center}
 
-The first term in this expression $(Q)$, the instantaneous flow rate, can be computed by dividing the annual volume of processes by the WWTP by the number of seconds in a year. The second term $(H_t)$, the total system head, can be computed summing the individual static and dynamic head components as in the following Equations \ref{eq:staticHead} and \ref{eq:dynamicHead}. The last three terms $(g,\rho, \& E)$ are constants that are characteristic to the system.
+The first term in this expression $(Q)$, the instantaneous flow rate, can be computed by dividing the annual volume of processes by the WWTP by the number of seconds in a year. The second term $(H_t)$, the total system head, can be computed summing the individual static and dynamic head components as in the following Equations \ref{eq:staticHead} and \ref{eq:dynamicHead} \cite{Liu2003}. The last three terms $(g,\rho, \& E)$ are constants that are characteristic to the system.
 
        \begin{equation}
           H_s = e_{i} - e_{o}  
@@ -102,7 +102,7 @@ The first term in this expression $(Q)$, the instantaneous flow rate, can be com
 
 Equation \ref{eq:staticHead} describes how the static head can be computed as the difference between the elevations at the inlet and the outlet locations for the pipeline. When the corridor specification is known, this difference can be straightforwardly assessed by referencing the first and last subscript indices of the corridor to a raster based digital elevation model.
 
-Computing the dynamic component $(H_d)$ of the total system head is a significantly more complicated process; however, it can, nonetheless, be similarly automated from the same detailed knowledge regarding the pipeline corridor specification and its underlying elevation profile. Equations \ref{eq:dynamicHead} through \ref{eq:frictionCoefficient} illustrate the sequence of operations by which dynamic head $(H_d)$ can be computed. 
+Computing the dynamic component $(H_d)$ of the total system head is a significantly more complicated process; however, it can, nonetheless, be similarly automated from the same detailed knowledge regarding the pipeline corridor specification and its underlying elevation profile. Equations \ref{eq:dynamicHead} through \ref{eq:frictionCoefficient} illustrate the sequence of operations by which dynamic head $(H_d)$ can be computed \cite{Liu2003}. 
 
        \begin{equation}
           H_d = \frac{K_{t} * V^2}{2g}
@@ -117,7 +117,7 @@ Computing the dynamic component $(H_d)$ of the total system head is a significan
            $V = $ The flow velocity \\
        \end{center}
        
-The dynamic head term is a representation of the frictional forces that arise from the movement of water through the pipeline. These cumulative effective of these forces are represented by the term $(K_t)$, total losses, and are multiplied by the square of the velocity at which the water is flowing. The $(K_t)$ can be parsed into two separate components, $(K_p \& K_f)$, as shown in Equation \ref{eq:totalLosses}. These two terms represent the relative contribution of the friction associated with the movement of water over the textured surface of the pipeline interior walls and the friction associated with the movement of water through a tortuous pipeline that has various connective fittings such as elbow joints and flow control valves. 
+The dynamic head term is a representation of the frictional forces that arise from the movement of water through the pipeline. These cumulative effective of these forces are represented by the term $(K_t)$, total losses, and are multiplied by the square of the velocity at which the water is flowing. The $(K_t)$ can be parsed into two separate components, $(K_p \& K_f)$, as shown in Equation \ref{eq:totalLosses} \cite{Liu2003}. These two terms represent the relative contribution of the friction associated with the movement of water over the textured surface of the pipeline interior walls and the friction associated with the movement of water through a tortuous pipeline that has various connective fittings such as elbow joints and flow control valves. 
 
        \begin{equation}
            K_{t} = K_{p} + K_{f}
@@ -131,7 +131,7 @@ The dynamic head term is a representation of the frictional forces that arise fr
            $K_f = $ The fitting loss component $(unitless)$ \\
        \end{center}       
        
-Typically, the velocity term $(V)$ is computed from the product of a specific flow rate $(Q)$ and pipeline cross sectional area $(A)$ as in Equation \ref{eq:velocity}. However, in the case of this analysis, the pipeline cross sectional area was solved for by specifying a maximum permissible flow velocity $V_{max} = (10 m/s)$ relative to some designated flow rate.
+Typically, the velocity term $(V)$ is computed from the product of a specific flow rate $(Q)$ and pipeline cross sectional area $(A)$ as in Equation \ref{eq:velocity}. However, in the case of this analysis, the pipeline cross sectional area was solved for by specifying a maximum permissible flow velocity $V_{max} = (10 m/s)$ relative to some designated flow rate \cite{Liu2003}.
        
        \begin{equation}
            V = \frac{Q}{A}
@@ -144,7 +144,7 @@ Typically, the velocity term $(V)$ is computed from the product of a specific fl
            $A = $ The cross sectional area of the pipe $(m^2)$\\
        \end{center}      
        
-The component of the total losses attributable to the cumulative friction encounter along the pipeline's pipe section walls $(K_p)$ can be calculated from Equation \ref{eq:pipeLosses} as the product of a friction coefficient $(f)$ and the pipeline length $(L)$ divided by the diameter of the pipeline pipe sections $(D)$.
+The component of the total losses attributable to the cumulative friction encounter along the pipeline's pipe section walls $(K_p)$ can be calculated from Equation \ref{eq:pipeLosses} as the product of a friction coefficient $(f)$ and the pipeline length $(L)$ divided by the diameter of the pipeline pipe sections $(D)$ \cite{Liu2003}.
        
        \begin{equation}
            K_{p} = \frac{f * L}{D}
@@ -159,7 +159,7 @@ The component of the total losses attributable to the cumulative friction encoun
            $D = $ The diameter of each pipe section $(m)$ \\
        \end{center}   
        
-The friction component $(f)$ of the pipeline loss term $(K_p)$ can be computed from the empirically derived Equation \ref{eq:frictionCoefficient} where $(k)$ is a roughness factor that is characteristic to the pipe section material construction and $(Re)$ is the Reynolds number which is a dimensionless quantity that this associated to the smoothness with which a fluid flows and can be derived from the fluid's characteristic kinematic viscosity $(\upsilon)$ as in Equation \ref{eq:reynolds}.
+The friction component $(f)$ of the pipeline loss term $(K_p)$ can be computed from the empirically derived Equation \ref{eq:frictionCoefficient} where $(k)$ is a roughness factor that is characteristic to the pipe section material construction and $(Re)$ is the Reynolds number which is a dimensionless quantity that this associated to the smoothness with which a fluid flows and can be derived from the fluid's characteristic kinematic viscosity $(\upsilon)$ as in Equation \ref{eq:reynolds} \cite{Liu2003}.
        
        \begin{equation}
            f = \frac{0.25}{ \left\{ \log_{10}{ \frac{k}{3.75 * D} + \frac{5.74}{Re^{0.9}} } \right\}^{2} }
@@ -184,7 +184,7 @@ The friction component $(f)$ of the pipeline loss term $(K_p)$ can be computed f
            $\upsilon = $ The kinematic viscosity of the fluid $(m^2/s)$ \\
        \end{center}   
        
-The fitting losses $(K_f)$, which makes up the second component of the total losses expression $(K_t)$ and which ultimately feeds into the calculation of dynamic head $(H_d)$, can be computed by using the corridor specification to cumulatively assess the need for various fitting components to facilitate pipeline deviations and flow control systems. The contribution of each fitting component to the total $(K_f)$ factor is empirically defined and can be iterative summing the contribution of each fitting $(K_n)$, multiplied by its appropriate fitting loss factor $(K'_n)$, along the entire length of the pipeline corridor as in Equation \ref{eq:fittingLossComponents}.
+The fitting losses $(K_f)$, which makes up the second component of the total losses expression $(K_t)$ and which ultimately feeds into the calculation of dynamic head $(H_d)$, can be computed by using the corridor specification to cumulatively assess the need for various fitting components to facilitate pipeline deviations and flow control systems. The contribution of each fitting component to the total $(K_f)$ factor is empirically defined and can be iterative summing the contribution of each fitting $(K_n)$, multiplied by its appropriate fitting loss factor $(K'_n)$, along the entire length of the pipeline corridor as in Equation \ref{eq:fittingLossComponents} \cite{Liu2003}.
 
         \begin{equation}
             K_f = \sum\limits_{i=1}^n \left\{ (K_1 * K'_1) + \dots + (K_n * K'_n) \right\}
@@ -200,7 +200,7 @@ The fitting losses $(K_f)$, which makes up the second component of the total los
        
 \section{Parameterizing Construction Material Requirements}
 
-Once the pump energy associated with the corridor specification has been computed according to method laid out in Equations \ref{eq:pumpEnergy} - \ref{eq:fittingLossComponents} the next step is to estimate the volume of reinforced concrete that must be poured to facilitate the construction of the requisite infrastructural components of the proposed reuse system. It is assumed for the purpose of this analysis that these new infrastructural components will principally be associated with the need to install one or more pumping houses which will be situated along the length of the corridor. The determination of the size of each of these facilities and their concomitant material footprints will be determined on the basis of the total pump energy required for each corridor and the structure of the different elevation profiles. Consideration will be given to economies of scale in terms of the efficiency that can be achieved through the operation of larger pump systems.  
+Once the pump energy associated with the corridor specification has been computed according to method laid out in Equations \ref{eq:pumpEnergy} - \ref{eq:fittingLossComponents} the next step is to estimate the volume of reinforced concrete that must be poured to facilitate the construction of the requisite infrastructural components of the proposed reuse system. It is assumed for the purpose of this analysis that these new infrastructural components will principally be associated with the need to install one or more pumping houses which will be situated along the length of the corridor \cite{Liu2003}. The determination of the size of each of these facilities and their concomitant material footprints will be determined on the basis of the total pump energy required for each corridor and the structure of the different elevation profiles. Consideration will be given to economies of scale in terms of the efficiency that can be achieved through the operation of larger pump systems.  
        
 \section{Parameterizing Chemical Consumption Rates} 
 
