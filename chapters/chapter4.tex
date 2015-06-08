@@ -11,6 +11,12 @@ All others bring data.
 
 \section{Santa Barbara Region}
 
+The first case study region, comprising the coastal southern portion of Santa Barbara County, was selected to reflect the local interests of the institution supporting this dissertation research. Hydrologically, this case study region is distinctly enclosed by a steep coastal mountain range to the north and the pacific ocean to the south. This case study area is not connected to any of the major inter-basin water transfer projects within the state (i.e. The State Water Project, the Los Angeles aqueduct, etc.). As such, Santa Barbara municipal water managers must be both creative and self reliant in terms of their long term municipal water supply strategies. 
+
+Fortunately, from a freshwater management perspective, the region's unique physical geography also functions to limit the possibilities for increased population growth and urban development. Thus, the prospects for severe water shortages due to steep increases in demand are fairly unlikely. Despite this fact however, the recent drought condition throughout the state have lead to high wholesale water costs for the Santa Barbara district. This is because they are in competition with regional agricultural interests with long term investments in costly orchard based crops that cannot be left to fallow. 
+
+In terms of alternative water supply options within the region, Santa Barbara has recently renewed talks for the development of a local seawater desalination plant that had been put on hold following the 2008 economic recession. This willingness to reconsider a high cost desalination based alternative freshwater supply strategy suggests that large scale municipal water reuse may also be put forth as a feasible alternative in the near term future and thus, that such a prospective analysis of the tradeoffs associated with such a system would indeed be valuable exercise.  
+
     \subsection{Regional Context}
     
     \begin{itemize}
@@ -34,6 +40,8 @@ All others bring data.
         \end{figure}
 
     \subsection{Search Domain}
+
+The search domain used for both the weighted overlay site suitability analysis as well as the corridor location problem specification is depicted in Figure \ref{fig:SBdomain}. The extent and dimensions of this search domain is depicted in the statistics below.
     
     \begin{itemize}
       \setlength{\itemsep}{0cm}
@@ -52,7 +60,13 @@ All others bring data.
         \end{figure}
         
     \subsection{Destination Search Inputs}
-    
+
+There are three key inputs to the weighted overlay analysis used to determine the location and extent of suitable sites for the implementation of artificial groundwater recharge basins within the region. The four layers which were generated as the discrete inputs to the WOA procedure are depicted in Figures \ref{fig:SBdsinputs_slope} through \ref{fig:SBdsinputs_landuse}. The first layer gives each cell in the search domain a score between 1 and 10 on the basis of the suitability of its slope for the implementation of a artificial groundwater recharge basin. Areas with steep slopes are given lower suitability scores. Areas with shallower slopes are given high suitability scores. 
+
+The second input to the WOA destination search process is based upon the permeability of the surface geology as shown in Figure \ref{fig:SBdsinputs_geology}. Permeability is a crucial parameter in determining the rate of infiltration that can be achieved by a recharge basin and thus the requisite size of a basin for the purpose achieving a specified total rate of recharge. The geology score layer gives each cell in the search domain a ordinal score between 1 and 10 on the basis of the underlying surface geology layer's permeability constant.
+
+The final input to the WOA destination search process is based upon the existing landuse as shown in Figure \ref{fig:SBdsinputs_landuse}. The existing landuse can be a proxy measure of both the cost of procurement for the landholdings required to implement the artificial recharge basin as well as the regulatory and engineering difficulty associated with artificial recharge basin implementation. Here again, these scores are have been pegged to a 1 to 10 ordinal scale that aligns with those assigned to each of the other two score layers. 
+
         \begin{figure}[!h]
             \begin{center}
             \includegraphics[width=5.5in]{figures/SantaBarbara_Search_Slope.png}   
@@ -79,6 +93,8 @@ All others bring data.
     
     \subsection{Destination Search Outputs}
     
+The raw output of the WOA destination search process is a composite layer of which depicts a measure of overall suitability for the given landuse application on an ordinal scale as in Figure \ref{fig:SBdsoutputs_comp}. This single composite suitability layer is then thresholded, selecting only those areas that have the highest composite suitability scores as shown in Figure \ref{fig:SBdsoutputs_cand}. A set of morphological operations is applied to this threshold mask which ranks each connected area of high suitability in terms of its size. Larger connected areas of high suitability are considered better in this process and thus, in this way, a single destination location for the corridor search process can be automatically selected as the single largest area of high aggregate suitability with the study area. 
+    
         \begin{figure}[!h]
             \begin{center}
             \includegraphics[width=5.5in]{figures/SantaBarbara_Search_Composite.png}   
@@ -97,6 +113,8 @@ All others bring data.
 
     \subsection{Proposed Corridor Endpoints}
     
+For the Santa Barbara case study region, the final output of the WOA analysis is shown in Figure \ref{fig:SBendpoints} in red and mapped relative to the location of the source location for the corridor location analysis that corresponds to the location of the largest WWTP within the basin, in green. These two points, plus the extent of the search domain, form the basis of the corridor location problem specification that is to be discussed in further detail in the subsequent section. 
+    
     \begin{itemize}
       \setlength{\itemsep}{0cm}
       \setlength{\parskip}{0cm}
@@ -114,6 +132,14 @@ All others bring data.
         \end{figure}
             
     \subsection{Proposed Objective Layers}
+    
+For the corridor location problem specification used as the input to the MOGADOR algorithm, four key pieces of information are required. The first three correspond to the source location, the destination location, and the search domain boundaries that have been previously described. The forth key input category corresponds to the objective score layers which capture the cost associated with routing sections of a corridor over each grid cell in the search domain. For this analysis, the following three distinct objectives were developed.
+
+The first objective category is based upon the accessibility of each location for the purposes of constructing and maintaining the water distribution infrastructure that the corridor is designed to support and is shown in Figure \ref{fig:SBaccessibility}. It is fundamentally easier to get materials and people to a locations that are positioned along road networks. As a result, the underlying road network topology was used to encode a continuous objective score layer with values ranging from 1 to 10 that can be described as a measure of "Accessibility" and which favors those locations that are on and around roads.
+
+The second objective category is based upon the existing land use regime within the regional search domain. The idea behind the composition of this objective can be thought of as somewhat of the converse of Accessibility in the sense that, regions which are already heavily developed are likely to be socially, politically, or economically challenging to implement corridors for large scale water distribution pipeline infrastructure. Using standardized USGS based land use classification, each grid cell in the search domain is given a nominal objective score value from 1 to 10  corresponding the relative level of "Disturbance" that would be associated with routing a corridor across it. This objective layer is depicted in the layer plotted in Figure \ref{fig:SBdisturbance}.
+
+The third objective category is derived from the underlying slope within the search domain. Steeper slopes are assigned a higher ordinal score, ranging from 1 to 10. This objective reflects the desire for corridors to be shorter in length and minimally accumulate slopes over their length. In this way, the slope score provides a mechanism for the corridor routing algorithm to preferentially favor corridors that would have minimal energy requirements in terms of the operational energy requirements of the anticipated water distribution infrastructure. This slope score objective layer is depicted in Figure \ref{fig:SBslope}. 
 
         \begin{figure}[!h]
             \begin{center}
@@ -121,7 +147,7 @@ All others bring data.
             \caption{Santa Barbara Region Accessibility Based Objective Scores (Blue:Low, Red:High)}
             \label{fig:SBaccessibilty}
             \end{center}
-        \end{figure}
+        \end{figure} 
 
         \begin{figure}[!h]
             \begin{center}
