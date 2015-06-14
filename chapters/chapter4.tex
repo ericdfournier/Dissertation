@@ -261,7 +261,7 @@ The search domain comprising the Oxnard study region is described in the statist
         
     \subsection{Destination Search Inputs}
     
-Here the three key inputs to the Oxnard reuse destination search process are shown. A cursory visual inspection of these three layers reveals that there is an obvious band of continuously high suitability stretching from the foot of the basin (at the lower left) along its lower portion nearly across its breadth (to the lower right). This corridor is flat low lying river bed. It possesses a highly permeable surface geology, a very shallow slope profile, and relatively low intensity land use applications, as such, its composite suitability is very high and likely to contain the ultimate destination site for the hypothetical reuse system. 
+In Figures \ref{fig:Odsinputs_slope} through \ref{fig:Odsinputs_landuse} the three key inputs to the Oxnard reuse destination search process are shown. A visual inspection of these three layers reveals that there is an obvious band of continuously high suitability stretching from the foot of the basin (at the lower left) along its lower portion nearly across its breadth (to the lower right). This corridor is flat low lying river bed. It possesses a highly permeable surface geology, a very shallow slope profile, and relatively low intensity land use applications. 
     
         \begin{figure}[!h]
             \begin{center}
@@ -289,6 +289,8 @@ Here the three key inputs to the Oxnard reuse destination search process are sho
     
     \subsection{Destination Search Outputs}
     
+The layer showing the composite suitability of each cell within the study site for the site of a destination artificial water reuse facility is shown in Figure \ref{fig:Odsoutputs_comp}. As this figure shows, the area with the highest composite suitability is that which was mentioned previously as being clearly visible within each of the individual input suitability layers. The majority of the top ranked areas of contiguous high suitability are contained within this region, as shown in Figure \ref{fig:Odsoutputs_cand}.
+    
         \begin{figure}[!h]
             \begin{center}
             \includegraphics[width=5.5in]{figures/Oxnard_Search_Composite.png}   
@@ -307,6 +309,8 @@ Here the three key inputs to the Oxnard reuse destination search process are sho
 
     \subsection{Proposed Corridor Endpoints}
     
+    For the Oxnard case study region, the final output of the WOA analysis is shown in Figure \ref{fig:Oendpoints} in red and mapped relative to the location of the source location for the corridor location analysis that corresponds to the location of the largest WWTP within the basin, in green. These two points, plus the extent of the search domain, form the basis of the corridor location problem specification that is to be discussed in further detail in the subsequent section. 
+    
     \begin{itemize}
       \setlength{\itemsep}{0cm}
       \setlength{\parskip}{0cm}
@@ -324,6 +328,8 @@ Here the three key inputs to the Oxnard reuse destination search process are sho
         \end{figure}
             
     \subsection{Proposed Objective Layers}
+    
+In Figures \ref{fig:Oaccessibility} through \ref{fig:Oslope} the three independent objective layers used as inputs to the MOGADOR problem specification for the Oxnard study site are shown. These three layers correspond to the categories of landuse disturbance, accessibility, and slope described previously for the Santa Barbara case study region and used for all of the other case studies in the analysis. 
 
         \begin{figure}[!h]
             \begin{center}
@@ -350,7 +356,14 @@ Here the three key inputs to the Oxnard reuse destination search process are sho
         \end{figure}
         
     \subsection{Proposed Corridor Solutions}
-    
+
+Figure \ref{fig:Oresults} presents a figure panel containing the outputs of the three separate MOGADOR algorithm runs for the Oxnard study site problem specification using three different population sizes. As this figure panel illustrates, the first algorithm run, with a population size of 1,000, delivered a set of 100 top output corridor solutions with aggregate objective score values ranging from 3585 to 3615. With the second run of the algorithm, where the population size was increased to a 10,000, the top 100 output corridor solutions' aggregate objective scores can be observed to have improved markedly, covering a range from 2910 to 2935. The line plot in the center of the figure attests to the fact that this improvement came from reductions in both the accessibility and disturbance scores associated with the new output corridor set.
+
+The final corridor solution set, generated from a MOGADOR model run where the input population size was fixed at a value of 100,000, produced an output set of top 100 solutions with an even lower range of composite objective scores: ranging from between 2740 to 2760. The improvement in this overall composite objective scores, as shown by the line plot at the lower center portion of the figure panel, can be observed as being attributable to marginal reductions in the accessibility and disturbance objective scores.  This can be interpreted as the algorithm locating corridors which route around areas with high intensity land uses and routing along the more highly accessible transportation network.
+
+Figure \ref{fig:OsolutionOverview} provides a broad plan overview illustration of the final output corridors produced by the MOGADOR solution run where the population size was set to a value of 100,000. 
+
+
         \begin{figure}[!h]
             \begin{center}
             \includegraphics[width=6in]{figures/Oxnard_PathwayResults.png}   
@@ -367,15 +380,15 @@ Here the three key inputs to the Oxnard reuse destination search process are sho
             \end{center}
         \end{figure}
         
+The corresponding elevation profile for the solution illustrated in Figure \ref{fig:OsolutionOverview} can be observed plotted in Figure \ref{fig:OelevationProfile}. This elevation profile reals that there is only a modest amount of elevation change along the length of the proposed corridor solution (roughly 130 meters). It also shows that this elevation gain is discontinuous along the length of the proposed corridor solution with there being to two modest hills -- each roughly 40 meters in height -- that must be ascended and descended before the destination is reached. 
+        
         \begin{figure}[!h]
             \begin{center}
             \includegraphics[width=5.5in]{figures/Oxnard_Elevation_Profile.png}
             \caption{Oxnard Region Proposed Corridor Elevation Profile}
             \label{fig:OelevationProfile}
             \end{center}
-        \end{figure}
-    
-    \subsection{Anticipated Distribution of Life Cycle Energy Usages and Net Water Savings}    
+        \end{figure}   
     
 \clearpage    
     
