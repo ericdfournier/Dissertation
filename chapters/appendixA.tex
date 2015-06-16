@@ -1,1 +1,4076 @@
+\chapter{}
+\label{A}
+
+Go Language Source Code Repository for a Parallel + Concurrent Implementation of the MOGADOR Algorithm for the 
+
+\begin{center}
+    
+    \url{https://github.com/ericdfournier/corridor}
+    
+\end{center}
+
+\newpage
+
+<LICENSE>
+
+\begin{lstlisting}[basicstyle=\tiny]
+
+Copyright (c) 2015, Eric Daniel Fournier
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+* Redistributions of source code must retain the above copyright notice, this
+  list of conditions and the following disclaimer.
+
+* Redistributions in binary form must reproduce the above copyright notice,
+  this list of conditions and the following disclaimer in the documentation
+  and/or other materials provided with the distribution.
+
+* Neither the name of corridor nor the names of its
+  contributors may be used to endorse or promote products derived from
+  this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+\end{lstlisting}
+
+\newpage
+
+<initialize.go>
+
+\begin{lstlisting}[basicstyle=\tiny]
+
+// Copyright ©2015 The corridor Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
+package corridor
+
+import (
+	"errors"
+	"fmt"
+	"math"
+	"runtime"
+	"sort"
+
+	"github.com/gonum/diff/fd"
+	"github.com/gonum/matrix/mat64"
+	"github.com/satori/go.uuid"
+)
+
+// new problem parameters function
+func NewParameters(sourceSubscripts, 
+    destinationSubscripts []int, 
+    populationSize, evolutionSize int, 
+    randomnessCoefficient float64) *Parameters {
+
+	// set default mutation count
+	mutationCount := 1
+
+	// set defacult mutation fraction
+	mutationFraction := 0.2
+
+	// set selection fraction
+	selectionFraction := 0.5
+
+	// set selection probability
+	selectionProbability := 0.8
+
+	// get concurrency size
+	maxConcurrency := runtime.NumCPU()
+
+	// return output
+	return &Parameters{
+		SrcSubs: sourceSubscripts,
+		DstSubs: destinationSubscripts,
+		RndCoef: randomnessCoefficient,
+		PopSize: populationSize,
+		SelFrac: selectionFraction,
+		SelProb: selectionProbability,
+		MutaCnt: mutationCount,
+		MutaFrc: mutationFraction,
+		EvoSize: evolutionSize,
+		ConSize: maxConcurrency,
+	}
+}
+
+// new domain initialization function
+func NewDomain(domainMatrix *mat64.Dense) *Domain {
+
+	// get domain size
+	rows, cols := domainMatrix.Dims()
+
+	// compute band count
+	bandCount := 2 + (int(math.Floor(math.Sqrt(math.Pow(float64(rows), 2.0)+math.Pow(float64(cols), 2.0)))) / 142)
+
+	//return output
+	return &Domain{
+		Rows:   rows,
+		Cols:   cols,
+		Matrix: domainMatrix,
+		BndCnt: bandCount,
+	}
+}
+
+// new objective initialization function
+func NewObjective(identifier int, fitnessMatrix *mat64.Dense) *Objective {
+
+	// return output
+	return &Objective{
+		Id:     identifier,
+		Matrix: fitnessMatrix,
+	}
+}
+
+// new basis solution initialization function
+func NewBasis(sourceSubs, destinationSubs []int, searchDomain *Domain) *Basis {
+
+	// compute all minimum euclidean distances for search domain
+	allMinimumDistances := AllMinDistance(sourceSubs, destinationSubs, searchDomain.Matrix)
+
+	// generate subscripts from bresenham's algorithm
+	subs := Bresenham(sourceSubs, destinationSubs)
+
+	// compute maximum permitted chromosome length
+	maxLength := len(subs) * 10
+
+	// return output
+	return &Basis{
+		Matrix: allMinimumDistances,
+		Subs:   subs,
+		MaxLen: maxLength,
+	}
+}
+
+// new chromosome initialization function
+func NewChromosome(searchDomain *Domain, 
+    searchParameters *Parameters, 
+    searchObjectives *MultiObjective) *Chromosome {
+
+	// generate node subscripts
+	nodeSubs := NewNodeSubs(searchDomain, searchParameters)
+
+	// generate subscripts from directed walk procedure
+	subs := MultiPartDirectedWalk(nodeSubs, searchDomain, searchParameters)
+
+	// initialize empty fitness place holders
+	fitVal := make([][]float64, searchObjectives.ObjectiveCount)
+	for i := 0; i < searchObjectives.ObjectiveCount; i++ {
+		fitVal[i] = make([]float64, len(subs))
+	}
+	totFit := make([]float64, searchObjectives.ObjectiveCount)
+	var aggFit float64 = 0.0
+
+	// generate placeholder variables
+	uuid := uuid.NewV4()
+
+	// return output
+	return &Chromosome{
+		Id:               uuid,
+		Subs:             subs,
+		Fitness:          fitVal,
+		TotalFitness:     totFit,
+		AggregateFitness: aggFit,
+	}
+}
+
+// new empty chromosome initialization function
+func NewEmptyChromosome(searchDomain *Domain, searchObjectives *MultiObjective) *Chromosome {
+
+	// initialize subscripts
+	subs := make([][]int, 0)
+
+	// generate placeholder id
+	uuid := uuid.NewV4()
+
+	// initialize empty fitness place holders
+	fitVal := make([][]float64, searchObjectives.ObjectiveCount)
+	for i := 0; i < searchObjectives.ObjectiveCount; i++ {
+		fitVal[i] = make([]float64, len(subs))
+	}
+	totFit := make([]float64, searchObjectives.ObjectiveCount)
+	var aggFit float64 = 0.0
+
+	// return output
+	return &Chromosome{
+		Id:               uuid,
+		Subs:             subs,
+		Fitness:          fitVal,
+		TotalFitness:     totFit,
+		AggregateFitness: aggFit,
+	}
+}
+
+// new population initialization function
+func NewPopulation(identifier int, 
+    searchDomain *Domain, 
+    searchParameters *Parameters, 
+    searchObjectives *MultiObjective) *Population {
+
+	// initialize communication channel
+	chr := make(chan *Chromosome, searchParameters.PopSize)
+
+	// initialize new empty chromosome before entering loop
+	newChrom := NewEmptyChromosome(searchDomain, searchObjectives)
+
+	// initialize concurrency limit channel
+	conc := make(chan bool, searchParameters.ConSize)
+
+	// generate chromosomes via go routines
+	for i := 0; i < searchParameters.PopSize; i++ {
+
+		// write to control channel
+		conc <- true
+
+		// launch chromosome initialization go routines
+		go func(searchDomain *Domain, searchParameters *Parameters, searchObjectives *MultiObjective) {
+			defer func() { <-conc }()
+			newChrom = NewChromosome(searchDomain, searchParameters, searchObjectives)
+			chr <- ChromosomeFitness(newChrom, searchObjectives)
+		}(searchDomain, searchParameters, searchObjectives)
+	}
+
+	// cap parallelism at concurrency limit
+	for j := 0; j < cap(conc); j++ {
+		conc <- true
+	}
+
+	// initialize fitness placeholder
+	meanFit := make([]float64, searchObjectives.ObjectiveCount)
+	var aggMeanFit float64 = 0.0
+
+	// return output
+	return &Population{
+		Id:                   identifier,
+		Chromosomes:          chr,
+		MeanFitness:          meanFit,
+		AggregateMeanFitness: aggMeanFit,
+	}
+
+}
+
+// new empty population initialization function
+func NewEmptyPopulation(identifier int, searchObjectives *MultiObjective) *Population {
+
+	// initialize empty chromosomes channel
+	chr := make(chan *Chromosome)
+
+	// initialize fitness placeholder
+	meanFit := make([]float64, searchObjectives.ObjectiveCount)
+	var aggMeanFit float64 = 0.0
+
+	// return output
+	return &Population{
+		Id:                   identifier,
+		Chromosomes:          chr,
+		MeanFitness:          meanFit,
+		AggregateMeanFitness: aggMeanFit,
+	}
+}
+
+// new empty evolution initialization function
+func NewEmptyEvolution(searchParameters *Parameters) *Evolution {
+
+	// initialize empty population channel
+	popChan := make(chan *Population, searchParameters.EvoSize)
+
+	// initialize empty fitness gradient
+	gradFit := make([]float64, searchParameters.EvoSize)
+
+	// return output
+	return &Evolution{
+		Populations:     popChan,
+		FitnessGradient: gradFit,
+	}
+}
+
+// new evolution initialization function
+func NewEvolution(searchParameters *Parameters, 
+    searchDomain *Domain, 
+    searchObjectives *MultiObjective) *Evolution {
+
+	// initialize seed population identifier
+	var popID int = 0
+
+	// initialize population channel
+	popChan := make(chan *Population, 1)
+
+	// print initialization status message
+	fmt.Println("Initializing Seed Population...")
+
+	// initialize seed population
+	seedPop := NewPopulation(popID, searchDomain, searchParameters, searchObjectives)
+	popChan <- PopulationFitness(seedPop, searchParameters, searchObjectives)
+
+	// initialize raw fitness data slice
+	rawAggMeanFit := make([]float64, searchParameters.EvoSize)
+
+	// initialize fitness gradient variable
+	gradFit := make([]float64, searchParameters.EvoSize)
+
+	// enter loop
+	for i := 0; i < searchParameters.EvoSize; i++ {
+
+		// perform population evolution
+		newPop := PopulationEvolution(<-popChan, searchDomain, searchParameters, searchObjectives)
+
+		// compute population fitness
+		newPop = PopulationFitness(newPop, searchParameters, searchObjectives)
+
+		// write aggregate mean fitness value to vector
+		rawAggMeanFit[i] = newPop.AggregateMeanFitness
+
+		// generate inline fitness gradient function
+		var fitnessGradFnc = func(n float64) float64 { return rawAggMeanFit[int(n)] }
+
+		// compute fitness gradient
+		gradFit[i] = fd.Derivative(fitnessGradFnc, float64(i), nil)
+
+		// skip gradient check on first iteration
+		if i < 1 {
+
+			// return new population to channel
+			popChan <- newPop
+
+			// increment progress bar
+			fmt.Println("Evolution: ", i+1)
+
+		} else if i >= 1 && i < (searchParameters.EvoSize-1) {
+
+			if gradFit[i] > 0 {
+
+				// return current population to channel
+				popChan <- newPop
+
+				// close population channel
+				close(popChan)
+
+				// print success message
+				fmt.Println("Convergence Achieved, Evolution Commplete!")
+
+				// break loop
+				break
+
+			} else if gradFit[i] <= 0 {
+
+				// return new population to channel
+				popChan <- newPop
+
+				// increment progress bar
+				fmt.Println("Evolution: ", i+1)
+
+			}
+
+		} else if i == searchParameters.EvoSize-1 {
+
+			// return new population to channel
+			popChan <- newPop
+
+			// close population channel
+			close(popChan)
+
+			// print termination message
+			fmt.Println("Convergence Not Achieved, Maximum Number of Evolutions Reached...")
+
+			// break loop
+			break
+		}
+	}
+
+	// return output
+	return &Evolution{
+		Populations:     popChan,
+		FitnessGradient: gradFit,
+	}
+}
+
+// function to return copies of a user specified fraction of
+// the individual chromosomes within a population ranked in terms
+// of individual aggregate fitness
+func NewEliteFraction(inputFraction float64, 
+    inputPopulation *Population) (outputChromosomes []*Chromosome) {
+
+	// count input chromosomes
+	chromCount := cap(inputPopulation.Chromosomes)
+
+	// initialize aggregate score slice
+	chromFrac := int(math.Ceil(inputFraction * float64(chromCount)))
+
+	// initialize chromosome map
+	chromMap := make(map[float64]*Chromosome)
+
+	// initialize chromosome map key slice
+	chromKey := make([]float64, chromCount)
+
+	// initialize output slice
+	output := make([]*Chromosome, chromFrac)
+
+	// loop through channel to populate slice
+	for i := 0; i < chromCount; i++ {
+		curChrom := <-inputPopulation.Chromosomes
+		chromMap[curChrom.AggregateFitness] = curChrom
+		chromKey[i] = curChrom.AggregateFitness
+	}
+
+	// sort on aggregate fitness keys
+	sort.Float64s(chromKey)
+
+	// loop through and generate output slice faction
+	for j := 0; j < chromFrac; j++ {
+		output[j] = chromMap[chromKey[j]]
+	}
+
+	// return output
+	return output
+}
+
+// function to return copies of a user specified number of
+// unique individual chromosomes from within a population
+// with each chromosome being ranked in terms of its
+// individual aggregate fitness
+func NewEliteSet(inputCount int, 
+    inputPopulation *Population, 
+        inputParameters *Parameters) (outputChromosomes []*Chromosome) {
+
+	// check band count against population size
+	if inputCount >= int(math.Floor((0.5 * float64(inputParameters.PopSize)))) {
+		err := errors.New("Input elite set count must be less than 1/2 the input population size \n")
+		panic(err)
+	}
+
+	// count input chromosomes
+	chromCount := cap(inputPopulation.Chromosomes)
+
+	// initialize chromosome map
+	chromMap := make(map[float64]*Chromosome)
+
+	// initialize chromosome map key slice
+	chromKey := make([]float64, chromCount)
+
+	// initialize output slice
+	output := make([]*Chromosome, inputCount)
+
+	// loop through channel to populate slice from channel
+	for i := 0; i < chromCount; i++ {
+		curChrom := <-inputPopulation.Chromosomes
+		chromMap[curChrom.AggregateFitness] = curChrom
+		chromKey[i] = curChrom.AggregateFitness
+		inputPopulation.Chromosomes <- curChrom
+	}
+
+	// sort on aggregate fitness keys
+	sort.Float64s(chromKey)
+
+	// initalize iteration counter
+	var iter int = 0
+
+	// loop through and generate output slice set
+	for j := 0; j < chromCount; j++ {
+
+		// deal with initial state
+		if j == 0 {
+			output[iter] = chromMap[chromKey[j]]
+			iter += 1
+			continue
+		}
+
+		// get uuids
+		prevUuid := chromMap[chromKey[j-1]].Id.String()
+		curUuid := chromMap[chromKey[j]].Id.String()
+
+		// impose uniqueness constraint
+		if prevUuid != curUuid {
+			output[iter] = chromMap[chromKey[j]]
+			iter += 1
+		} else {
+			continue
+		}
+
+		// stop if inputCount reached
+		if iter == inputCount {
+			break
+		}
+	}
+
+	// return output
+	return output
+}
+
+\end{lstlisting}
+
+\newpage
+
+<io.go>
+
+\begin{lstlisting}[basicstyle=\tiny]
+
+// Copyright ©2015 The corridor Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
+package corridor
+
+import (
+	"encoding/csv"
+	"fmt"
+	"os"
+	"strconv"
+	"time"
+
+	"github.com/gonum/matrix/mat64"
+)
+
+// function to write an input comma separated value
+// file's contents to an output domain structure
+func CsvToSubs(inputFilepath string) (outputSubs []int) {
+
+	// open file
+	data, err := os.Open(inputFilepath)
+
+	// parse error if file not found
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	// close file on completion
+	defer data.Close()
+
+	// generate new reader from open file
+	reader := csv.NewReader(data)
+
+	// set reader structure field
+	reader.FieldsPerRecord = -1
+
+	// use reader to read raw csv data
+	rawCSVdata, err := reader.ReadAll()
+
+	// parse csv file formatting errors
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
+	// initialize empty row and column counts
+	rows := len(rawCSVdata)
+	cols := len(rawCSVdata[0])
+
+	// initialize output
+	output := make([]int, 2)
+
+	// loop through and extract values
+	for i := 0; i < rows; i++ {
+		for j := 0; j < cols; j++ {
+
+			// get string value and convert to integer
+			strVal := rawCSVdata[i][j]
+			intVal, err := strconv.Atoi(strVal)
+
+			// shift value by one to account for buffer boundaries
+			output[j] = intVal + 1
+
+			// parse error
+			if err != nil {
+				fmt.Println(err)
+				os.Exit(1)
+			}
+		}
+	}
+
+	// return output
+	return output
+}
+
+// function to write an input comma separated value
+// file's contents to an output domain structure
+func CsvToDomain(inputFilepath string) (outputDomain *Domain) {
+
+	// open file
+	data, err := os.Open(inputFilepath)
+
+	// parse error if file not found
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	// close file on completion
+	defer data.Close()
+
+	// generate new reader from open file
+	reader := csv.NewReader(data)
+
+	// set reader structure field
+	reader.FieldsPerRecord = -1
+
+	// use reader to read raw csv data
+	rawCSVdata, err := reader.ReadAll()
+
+	// parse csv file formatting errors
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
+	// initialize empty row and column counts
+	rows := len(rawCSVdata)
+	cols := len(rawCSVdata[0])
+
+	// initialize domain matrix
+	domMat := mat64.NewDense(rows+2, cols+2, nil)
+
+	// write values from rawCSVdata to domain matrix
+	for i := 0; i < rows+2; i++ {
+		for j := 0; j < cols+2; j++ {
+			// create a 1 pixel boundary buffer of zeros
+			if i == 0 {
+				domMat.Set(i, j, 0.0)
+			} else if i == rows+1 {
+				domMat.Set(i, j, 0.0)
+			} else if j == 0 {
+				domMat.Set(i, j, 0.0)
+			} else if j == cols+1 {
+				domMat.Set(i, j, 0.0)
+			} else {
+
+				// get string value and convert to integer
+				strVal := rawCSVdata[i-1][j-1]
+				fltVal, err := strconv.ParseFloat(strVal, 64)
+
+				// parse error
+				if err != nil {
+					fmt.Println(err)
+					os.Exit(1)
+				}
+
+				// write value to matrix
+				domMat.Set(i, j, fltVal)
+			}
+		}
+	}
+
+	// initialize new domain
+	output := NewDomain(domMat)
+
+	// return output
+	return output
+}
+
+// function to write an input comma separated value
+// file's contents to an output objective structure
+func CsvToObjective(identifier int, inputFilepath string) (outputObjective *Objective) {
+
+	// open file
+	dataFile, err := os.Open(inputFilepath)
+
+	// parse error if file not found
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	// close file on completion
+	defer dataFile.Close()
+
+	// generate new reader from open file
+	reader := csv.NewReader(dataFile)
+
+	// set reader structure field
+	reader.FieldsPerRecord = -1
+
+	// use reader to read raw csv data
+	rawCSVdata, err := reader.ReadAll()
+
+	// parse csv file formatting errors
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
+	// initialize empty row and column counts
+	rows := len(rawCSVdata)
+	cols := len(rawCSVdata[0])
+
+	// initialize domain matrix
+	objMat := mat64.NewDense(rows+2, cols+2, nil)
+
+	// write values from rawCSVdata to domain matrix
+	for i := 0; i < rows+2; i++ {
+		for j := 0; j < cols+2; j++ {
+
+			// create a 1 pixel boundary buffer of zeros
+			if i == 0 {
+				objMat.Set(i, j, 0.0)
+			} else if i == rows+1 {
+				objMat.Set(i, j, 0.0)
+			} else if j == 0 {
+				objMat.Set(i, j, 0.0)
+			} else if j == cols+1 {
+				objMat.Set(i, j, 0.0)
+			} else {
+
+				// get string value and convert to float
+				strVal := rawCSVdata[i-1][j-1]
+				fltVal, err := strconv.ParseFloat(strVal, 64)
+
+				// parse error
+				if err != nil {
+					fmt.Println(err)
+					os.Exit(1)
+				}
+
+				// write matrix value
+				objMat.Set(i, j, fltVal)
+			}
+		}
+	}
+
+	// initialize new domain
+	output := NewObjective(identifier, objMat)
+
+	// return output
+	return output
+}
+
+// function to write a set of input comma separated value
+// files' contents to an output multiobjective structure
+func CsvToMultiObjective(inputFilepaths ...string) (outputMultiObjective *MultiObjective) {
+
+	// get variadic input length
+	objectiveCount := len(inputFilepaths)
+
+	// initialize objective slice
+	objectiveSlice := make([]*Objective, objectiveCount)
+
+	// initialize objectives identifier
+	var objectiveID int = 0
+
+	// loop through and extract objectives
+	for i := 0; i < objectiveCount; i++ {
+
+		// read CSV data to objective
+		objectiveSlice[i] = CsvToObjective(objectiveID, inputFilepaths[i])
+
+		// increment objective identifier
+		objectiveID += 1
+
+	}
+
+	// return multiObjective output
+	return &MultiObjective{
+		ObjectiveCount: objectiveCount,
+		Objectives:     objectiveSlice,
+	}
+}
+
+// function to write the values from an input
+// chromosome structure to an output csv file
+func ChromosomeToString(inputChromosome *Chromosome) (outputRawString [][]string) {
+
+	// get input chromosome length
+	chromLen := len(inputChromosome.Subs)
+
+	// count input chromosome objectives
+	objCount := len(inputChromosome.TotalFitness)
+
+	// intitialize raw output string slice
+	rawCSVdata := make([][]string, objCount+2)
+
+	// loop through and format values as strings for output encoding
+	for j := 0; j < objCount+2; j++ {
+
+		// allocate inner slice
+		rawCSVdata[j] = make([]string, chromLen)
+
+		for i := 0; i < chromLen; i++ {
+
+			// transpose subs by one to account for boundary buffer
+			if j == 0 {
+				rawCSVdata[j][i] = strconv.Itoa(inputChromosome.Subs[i][0] - 1)
+			} else if j == 1 {
+				rawCSVdata[j][i] = strconv.Itoa(inputChromosome.Subs[i][1] - 1)
+			} else {
+				rawCSVdata[j][i] = strconv.FormatFloat(inputChromosome.Fitness[j-2][i], 'f', 2, 64)
+			}
+		}
+	}
+
+	// return output
+	return rawCSVdata
+}
+
+// function to write the values from an input elite set
+// to an output csv file
+func EliteSetToCsv(inputEliteSet []*Chromosome, outputFilepath string) {
+
+	// open file
+	csvfile, err := os.Create(outputFilepath)
+
+	// parse file opening errors
+	if err != nil {
+		fmt.Println("Error:", err)
+		return
+	}
+
+	// close file on completion
+	defer csvfile.Close()
+
+	// get chromosome count
+	chromCount := len(inputEliteSet)
+
+	// initialize rawCSVdata and chromosome string structures
+	var chromString, rawCSVdata [][]string
+
+	// loop through chromsomes and generate composite string structure
+	for i := 0; i < chromCount; i++ {
+		chromString = ChromosomeToString(inputEliteSet[i])
+		rawCSVdata = append(rawCSVdata, chromString...)
+	}
+
+	// initialize writer object
+	writer := csv.NewWriter(csvfile)
+
+	// write data or get error
+	err = writer.WriteAll(rawCSVdata)
+
+	// parse errors
+	if err != nil {
+		fmt.Println("Error:", err)
+		return
+	}
+
+	// flush writer object
+	writer.Flush()
+}
+
+// function to write the runtime parameters from an evolution
+// to an output csv file
+func RuntimeLogToCsv(inputEvolution *Evolution, 
+    inputRuntime time.Duration, 
+    outputFilepath string) {
+
+	// open file
+	csvfile, err := os.Create(outputFilepath)
+
+	// parse file opening errors
+	if err != nil {
+		fmt.Println("Error:", err)
+		return
+	}
+
+	// close file on completion
+	defer csvfile.Close()
+
+	// initialize rawCSVdata structure
+	var rawCSVdata []string
+
+	// populate string slice
+	rawCSVdata = append(rawCSVdata, inputRuntime.String())
+
+	// initalize evolutionary counter
+	var evo int = 0
+
+	// count required evolutions
+	for i := 0; i < len(inputEvolution.FitnessGradient); i++ {
+		if inputEvolution.FitnessGradient[i] != 0 {
+			evo += 1
+		} else {
+			continue
+		}
+	}
+
+	// convert to string
+	rawCSVdata = append(rawCSVdata, strconv.Itoa(evo))
+
+	// initialize writer object
+	writer := csv.NewWriter(csvfile)
+
+	// write data or get error
+	err = writer.Write(rawCSVdata)
+
+	// parse errors
+	if err != nil {
+		fmt.Println("Error:", err)
+		return
+	}
+
+	// flush writer object
+	writer.Flush()
+}
+
+\end{lstlisting}
+
+\newpage
+
+<lib.go>
+
+\begin{lstlisting}[basicstyle=\tiny]
+
+// Copyright ©2015 The corridor Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.package main
+
+package corridor
+
+import (
+	"errors"
+	"math"
+
+	"github.com/gonum/matrix/mat64"
+)
+
+// compute euclidean distance for a pair of subscript indices
+func Distance(aSubs, bSubs []int) (dist float64) {
+
+	// initialize variables
+	var x0 float64 = float64(aSubs[0])
+	var x1 float64 = float64(bSubs[0])
+	var y0 float64 = float64(aSubs[1])
+	var y1 float64 = float64(bSubs[1])
+	var pow float64 = 2.0
+	var dx float64 = x1 - x0
+	var dy float64 = y1 - y0
+
+	// compute distance
+	var output float64 = math.Sqrt(math.Pow(dx, pow) + math.Pow(dy, pow))
+
+	// return final output
+	return output
+}
+
+// alldistance computes the distance from each location with the input
+// search domain and a given point defined by an input pair of row
+// column subscripts
+func AllDistance(aSubs []int, 
+    searchDomainMatrix *mat64.Dense) (allDistMatrix *mat64.Dense) {
+
+	// get matrix dimensions
+	rows, cols := searchDomainMatrix.Dims()
+
+	// initialize new output matrix
+	output := mat64.NewDense(rows, cols, nil)
+
+	// initialize destination point subscript slice
+	bSubs := make([]int, 2)
+
+	// loop through all values and compute minimum distances
+	for i := 0; i < rows; i++ {
+		for j := 0; j < cols; j++ {
+			bSubs[0] = i
+			bSubs[1] = j
+			output.Set(bSubs[0], bSubs[1], Distance(aSubs, bSubs))
+		}
+	}
+
+	// return output
+	return output
+
+}
+
+// compute the minimum distance between a given input point and
+// the subscripts comprised of a line segement joining two other
+// input points
+func MinDistance(pSubs, aSubs, bSubs []int) (minDist float64) {
+
+	// initialize variables
+	var x float64 = float64(pSubs[0])
+	var y float64 = float64(pSubs[1])
+	var x0 float64 = float64(aSubs[0])
+	var y0 float64 = float64(aSubs[1])
+	var x1 float64 = float64(bSubs[0])
+	var y1 float64 = float64(bSubs[1])
+
+	// compute difference components
+	a := x - x0
+	b := y - y0
+	c := x1 - x0
+	d := y1 - y0
+
+	// compute dot product of difference components
+	dot := a*c + b*d
+	lenSq := c*c + d*d
+
+	// initialize parameter
+	var param float64 = -1.0
+
+	// if zero length condition
+	if lenSq != 0 {
+		param = dot / lenSq
+	}
+
+	// initialize transform variables
+	var xx, yy float64
+
+	// switch transform mechanism on orientation
+	if param < 0 {
+		xx = x0
+		yy = y0
+	} else if param > 1 {
+		xx = x1
+		yy = y1
+	} else {
+		xx = x0 + param*c
+		yy = y0 + param*d
+	}
+
+	// execute transform
+	var dx float64 = x - xx
+	var dy float64 = y - yy
+
+	// generate output
+	output := math.Sqrt(dx*dx + dy*dy)
+
+	// return final output
+	return output
+}
+
+// allmindistance computes the distance from each location within the
+// input search domain and to the nearest subscript located along the
+// line formed by the two input subscripts
+func AllMinDistance(aSubs, bSubs []int, 
+    searchDomainMatrix *mat64.Dense) (allMinDistMatrix *mat64.Dense) {
+
+	// get matrix dimensions
+	rows, cols := searchDomainMatrix.Dims()
+
+	// initialize new output matrix
+	output := mat64.NewDense(rows, cols, nil)
+
+	// initialize slice
+	pSubs := make([]int, 2)
+
+	// loop through all values and compute minimum distances
+	for i := 0; i < rows; i++ {
+		for j := 0; j < cols; j++ {
+			pSubs[0] = i
+			pSubs[1] = j
+			curMinDist := MinDistance(pSubs, aSubs, bSubs)
+			output.Set(pSubs[0], pSubs[1], curMinDist)
+		}
+	}
+
+	// return final output
+	return output
+}
+
+// distancebands recodes a distance matrix computed from a single
+// source location to ordinal set of bands of increasing distance
+func DistanceBands(bandCount int, distanceMatrix *mat64.Dense) (bandMatrix *mat64.Dense) {
+
+	// get matrix dimensions
+	rows, cols := distanceMatrix.Dims()
+
+	// check band count against input distance matrix size
+	if bandCount > rows || bandCount > cols {
+		err := errors.New("Input band count too large for input distance matrix \n")
+		panic(err)
+	}
+
+	// initialize output
+	output := mat64.NewDense(rows, cols, nil)
+
+	// generate band range
+	minDist := distanceMatrix.Min()
+	maxDist := distanceMatrix.Max()
+
+	// initialize band interval unit and slice
+	bandUnit := (maxDist - minDist) / float64(bandCount+1)
+	bandInt := make([]float64, bandCount+1)
+
+	// generate band intervals
+	for i := 0; i < bandCount+1; i++ {
+		if i == 0 {
+			bandInt[i] = 0
+		} else {
+			bandInt[i] = bandInt[i-1] + bandUnit
+		}
+	}
+
+	// perform conversion to the appropriate band interval
+	for i := 0; i < len(bandInt)-1; i++ {
+		for j := 0; j < rows; j++ {
+			for k := 0; k < rows; k++ {
+				if distanceMatrix.At(j, k) >= bandInt[i] && distanceMatrix.At(j, k) < bandInt[i+1] {
+					output.Set(j, k, float64(i))
+				} else if distanceMatrix.At(j, k) >= bandInt[i+1] {
+					output.Set(j, k, float64(i+1))
+				}
+			}
+		}
+	}
+
+	// return output
+	return output
+}
+
+// bandmask selects the elements in a distance band matrix
+// corresponding to a specified input band identification number
+// and outputs a binary matrix of the same dimensions as the distance
+// band matrix with the values at those locations encoded as ones
+// and all other locations encoded as zeros
+func BandMask(bandValue float64, bandMatrix *mat64.Dense) (binaryBandMat *mat64.Dense) {
+
+	// get row column dimensions of band matrix
+	rows, cols := bandMatrix.Dims()
+
+	// initialize output
+	output := mat64.NewDense(rows, cols, nil)
+
+	// loop through matrix values and perform binary encoding
+	for i := 0; i < rows; i++ {
+		for j := 0; j < cols; j++ {
+
+			// perform elementwise equality test
+			if i == 0 || i == rows-1 || j == 0 || j == cols-1 {
+				output.Set(i, j, 0.0)
+			} else {
+				if bandValue == bandMatrix.At(i, j) {
+					output.Set(i, j, 1.0)
+				} else {
+					output.Set(i, j, 0.0)
+				}
+			}
+		}
+	}
+
+	// return output
+	return output
+}
+
+// nonzerosubs returns a 2-D slice containing the row column indices
+// of all nonzero elements contained wihtin a given input matrix
+func NonZeroSubs(inputMatrix *mat64.Dense) (nonZeroSubs [][]int) {
+
+	// get matrix dimensions
+	rows, cols := inputMatrix.Dims()
+
+	// initialize output
+	output := make([][]int, 1)
+	output[0] = make([]int, 2)
+
+	// initialize iterator and current subscript slice
+	var iter int = 0
+
+	// loop through and check values
+	for i := 0; i < rows; i++ {
+		for j := 0; j < cols; j++ {
+
+			// test for non-zero values
+			if inputMatrix.At(i, j) != 0.0 {
+				if iter == 0 {
+					output[iter] = []int{i, j}
+					iter += 1
+				} else if iter > 0 {
+					output = append(output, []int{i, j})
+					iter += 1
+				}
+			}
+		}
+	}
+
+	// return output
+	return output
+}
+
+// findsubs returns a 2-D slice containing the row column indices
+// of all of the elements contained wihtin a given input matrix
+// that are equal in value to some provided input value
+func FindSubs(inputValue float64, inputMatrix *mat64.Dense) (foundSubs [][]int) {
+
+	// get matrix dimensions
+	rows, cols := inputMatrix.Dims()
+
+	// initialize output
+	output := make([][]int, 1)
+	output[0] = make([]int, 2)
+
+	// initialize iterator and current subscript slice
+	var iter int = 0
+
+	// loop through and check values
+	for i := 0; i < rows; i++ {
+		for j := 0; j < cols; j++ {
+
+			// test for equality
+			if inputMatrix.At(i, j) == inputValue {
+				if iter == 0 {
+					output[iter] = []int{i, j}
+					iter += 1
+				} else if iter > 0 {
+					output = append(output, []int{i, j})
+					iter += 1
+				}
+			}
+		}
+	}
+
+	// return output
+	return output
+}
+
+// orientation accepts as inputs a pair of point subscripts
+// and returns a binary vector indicating the relative orientation
+// of the first point to the second in binary terms
+func Orientation(aSubs, bSubs []int) (orientationVector []int) {
+
+	// initialize output
+	output := make([]int, 2)
+
+	// generate reference orientation row parameter
+	if aSubs[0]-bSubs[0] < 0 {
+		output[0] = 1
+	} else if aSubs[0]-bSubs[0] == 0 {
+		output[0] = 0
+	} else if aSubs[0]-bSubs[0] > 0 {
+		output[0] = -1
+	}
+
+	// generate reference orientation column parameter
+	if aSubs[1]-bSubs[1] < 0 {
+		output[1] = 1
+	} else if aSubs[1]-bSubs[1] == 0 {
+		output[1] = 0
+	} else if aSubs[1]-bSubs[1] > 0 {
+		output[1] = -1
+	}
+
+	// return output
+	return output
+}
+
+// orientation mask returns a binary encoded matrix for
+// a given point where all points orientated towards
+// a given second point are encoded as 1 and all points
+// orientated away from the given second point as 0
+func OrientationMask(aSubs, bSubs []int, 
+    searchDomainMatrix *mat64.Dense) (orientationMask *mat64.Dense) {
+
+	// generate matrix dimensions
+	rows, cols := searchDomainMatrix.Dims()
+
+	// initialize output matrix
+	output := mat64.NewDense(rows, cols, nil)
+
+	// generate reference orientation vectors
+	sRefOrientVec := Orientation(aSubs, bSubs)
+	dRefOrientVec := Orientation(bSubs, aSubs)
+
+	// initialize current subs and orientation vectors
+	curSubs := make([]int, 2)
+	sOrientVec := make([]int, 2)
+	dOrientVec := make([]int, 2)
+
+	// loop through domain matrix and generate orientation matrix values
+	for i := 0; i < rows; i++ {
+		for j := 0; j < cols; j++ {
+
+			// compute current orientation
+			curSubs[0] = i
+			curSubs[1] = j
+			sOrientVec = Orientation(curSubs, bSubs)
+			dOrientVec = Orientation(curSubs, aSubs)
+
+			// check for match and assign values
+			if sOrientVec[0] == sRefOrientVec[0] && sOrientVec[1] == sRefOrientVec[1] {
+				if dOrientVec[0] == dRefOrientVec[0] && dOrientVec[1] == dRefOrientVec[1] {
+					output.Set(i, j, 1.0)
+				}
+			}
+		}
+	}
+
+	// return output
+	return output
+}
+
+// bresenham generates the list of subscript indices corresponding to the
+// euclidean shortest paths connecting two subscript pairs in discrete space
+func Bresenham(aSubs, bSubs []int) (lineSubs [][]int) {
+
+	// initialize variables
+	var x0 int = aSubs[0]
+	var x1 int = bSubs[0]
+	var y0 int = aSubs[1]
+	var y1 int = bSubs[1]
+
+	// check row differential
+	dx := x1 - x0
+	if dx < 0 {
+		dx = -dx
+	}
+
+	// check column differential
+	dy := y1 - y0
+
+	// if differential is negative flip
+	if dy < 0 {
+		dy = -dy
+	}
+
+	// initialize stride variables
+	var sx, sy int
+
+	// set row stride direction
+	if x0 < x1 {
+		sx = 1
+	} else {
+		sx = -1
+	}
+
+	// set column stride direction
+	if y0 < y1 {
+		sy = 1
+	} else {
+		sy = -1
+	}
+
+	// calculate error component
+	err := dx - dy
+
+	// initialize output 2D slice vector
+	dist := math.Ceil(Distance(aSubs, bSubs))
+	maxLen := int(dist)
+	output := make([][]int, 0, maxLen)
+
+	// loop through and generate subscripts
+	for {
+		var val = []int{x0, y0}
+		output = append(output, val)
+		if x0 == x1 && y0 == y1 {
+			break
+		}
+		e2 := 2 * err
+		if e2 > -dy {
+			err -= dy
+			x0 += sx
+		}
+		if e2 < dx {
+			err += dx
+			y0 += sy
+		}
+	}
+
+	// return final output
+	return output
+}
+
+// function to return the subscript indices of the cells corresponding to the
+// queens neighborhood for a given subscript pair
+func NeighborhoodSubs(aSubs []int) (neighSubs [][]int) {
+
+	// initialize output slice
+	output := make([][]int, 0)
+
+	// write neighborhood subscript values
+	output = append(output, []int{aSubs[0] - 1, aSubs[1] - 1})
+	output = append(output, []int{aSubs[0] - 1, aSubs[1]})
+	output = append(output, []int{aSubs[0] - 1, aSubs[1] + 1})
+	output = append(output, []int{aSubs[0], aSubs[1] - 1})
+	output = append(output, []int{aSubs[0], aSubs[1]})
+	output = append(output, []int{aSubs[0], aSubs[1] + 1})
+	output = append(output, []int{aSubs[0] + 1, aSubs[1] - 1})
+	output = append(output, []int{aSubs[0] + 1, aSubs[1]})
+	output = append(output, []int{aSubs[0] + 1, aSubs[1] + 1})
+
+	// return output
+	return output
+}
+
+// function to validate an input sub domain for use in generating
+// a chromosomal mutation via the random walk procedure
+func ValidateSubDomain(subSource, subDestin []int, subMat *mat64.Dense) bool {
+
+	// initialize output
+	var output bool
+
+	// generate sub source neighborhood
+	sNeigh := NeighborhoodSubs(subSource)
+
+	// generate sub destination neighborhood
+	dNeigh := NeighborhoodSubs(subDestin)
+
+	// generate center row
+	centerRow := subMat.RowView(2)
+
+	// generate center column
+	centerCol := subMat.ColView(2)
+
+	// initialize summation variables
+	var sSum float64 = 0.0
+	var dSum float64 = 0.0
+	var rSum float64 = 0.0
+	var cSum float64 = 0.0
+
+	// enter for loop for start and destination sums
+	for i := 0; i < 9; i++ {
+		sSum = sSum + subMat.At(sNeigh[i][0], sNeigh[i][1])
+		dSum = dSum + subMat.At(dNeigh[i][0], dNeigh[i][1])
+	}
+
+	// enter for loop for row column sums
+	for j := 0; j < 5; j++ {
+		rSum = rSum + centerRow.At(j, 0)
+		cSum = cSum + centerCol.At(j, 0)
+	}
+
+	// check conditions to validate neighborhood
+	if sSum <= 1.0 || dSum <= 1.0 || rSum == 0.0 || cSum == 0.0 {
+		output = false
+	} else {
+		output = true
+	}
+
+	//return final output
+	return output
+}
+
+// function validate the tabu neighborhood of an input pair of
+// row column subscripts
+func ValidateTabu(currentSubs []int, tabuMatrix *mat64.Dense) bool {
+
+	// initialize output
+	var output bool
+
+	// initialize tabu neighborhood sum
+	var tSum int = 0
+
+	// generate neighborhood subscripts
+	tNeigh := NeighborhoodSubs(currentSubs)
+
+	// loop through and compute sum
+	for i := 0; i < 9; i++ {
+		if i != 4 {
+			tSum += int(tabuMatrix.At(tNeigh[i][0], tNeigh[i][1]))
+		}
+	}
+
+	// write output boolean
+	if tSum == 0 {
+		output = false
+	} else {
+		output = true
+	}
+
+	// return output
+	return output
+}
+
+// function to count the number of digits in an input integer as
+// its base ten logarithm
+func DigitCount(input int) (digits int) {
+
+	// compute digits as the log of the input
+	output := int(math.Floor(math.Log10(float64(input))))
+
+	// return output
+	return output
+}
+
+\end{lstlisting}
+
+\newpage
+
+<lib\_test.go>
+
+\begin{lstlisting}[basicstyle=\tiny]
+
+// Copyright ©2015 The corridor Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.package main
+
+package corridor
+
+import (
+	"math"
+	"testing"
+
+	"github.com/gonum/matrix/mat64"
+)
+
+// test Distance function
+func TestDistance(t *testing.T) {
+
+	// initialize test case
+	t.Log("Distance Test: Expected Distance = 10")
+
+	// initialize expected values
+	var expValue float64 = 10.0
+
+	// initialize test case variables
+	var aSubs = []int{0, 10}
+	var bSubs = []int{0, 20}
+
+	// perform test case
+	testCase := Distance(aSubs, bSubs)
+
+	// log test result
+	if testCase == expValue {
+		t.Log("Distance Test: Computed Distance =", testCase)
+	} else {
+		t.Error("Distance Test: Computed Distance =", testCase)
+	}
+}
+
+// test AllDistance function
+func TestAllDistance(t *testing.T) {
+
+	// initialize test case
+	t.Log("AllDistance Test: Expected Matrix = 
+	    {{3 3 3 [1.4142135623730951 1 1.4142135623730951 1 0 1 1.4142135623730951 1 1.4142135623730951]} 3 3}")
+
+	// initialize expected value
+	var expValueVector = []float64{
+		math.Sqrt(2.0), 1.0, math.Sqrt(2.0),
+		1.0, 0, 1.0,
+		math.Sqrt(2.0), 1.0, math.Sqrt(2.0)}
+	expValueMatrix := mat64.NewDense(3, 3, expValueVector)
+
+	// initialize test case variables
+	var aSubs = []int{1, 1}
+	searchDomainMatrix := mat64.NewDense(3, 3, nil)
+
+	// perform test case
+	testCase := AllDistance(aSubs, searchDomainMatrix)
+
+	// log test result
+	if testCase.Equals(expValueMatrix) == true {
+		t.Log("AllDistance Test: Computed Matrix =", *testCase)
+	} else {
+		t.Error("AllDistance Test: Computed Matrix =", *testCase)
+	}
+}
+
+// test MinDistance function
+func TestMinDistance(t *testing.T) {
+
+	// initialize test case
+	t.Log("MinDistance Test: Expected Value = 1.4142135623730951")
+
+	// initialize expected value
+	var expValue float64 = math.Sqrt(2.0)
+
+	// initialize test case variables
+	var pSubs = []int{0, 2}
+	var aSubs = []int{0, 0}
+	var bSubs = []int{2, 2}
+
+	// perform test case
+	testCase := MinDistance(pSubs, aSubs, bSubs)
+
+	// log test result
+	if testCase == expValue {
+		t.Log("MinDistance Test: Computed Value =", testCase)
+	} else {
+		t.Error("AllDistance Test: Computed Value =", testCase)
+	}
+}
+
+// test AllMinDistance function
+func TestAllMinDistance(t *testing.T) {
+
+	// initialize test case
+	t.Log("AllMinDistance Test: 
+	    Expected Matrix = {{3 3 3 [0 1 1.4142135623730951 1 0 1 1.4142135623730951 1 0]} 3 3}")
+
+	// initialize expected value
+	var expValueVector = []float64{
+		0.0, (math.Sqrt(2.0) / 2.0), math.Sqrt(2.0),
+		(math.Sqrt(2.0) / 2.0), 0.0, (math.Sqrt(2.0) / 2.0),
+		math.Sqrt(2.0), (math.Sqrt(2.0) / 2.0), 0.0}
+	expValueMatrix := mat64.NewDense(3, 3, expValueVector)
+
+	// initialize test case variables
+	var aSubs = []int{0, 0}
+	var bSubs = []int{2, 2}
+	searchDomainMatrix := mat64.NewDense(3, 3, nil)
+
+	// peform test case
+	testCase := AllMinDistance(aSubs, bSubs, searchDomainMatrix)
+
+	// log test result
+	if testCase.Equals(expValueMatrix) {
+		t.Log("AllMinDistance Test: Computed Matrix =", testCase)
+	} else {
+		t.Error("AllMinDistance Test: Computed Matrix =", testCase)
+	}
+}
+
+// test DistanceBands
+func TestDistanceBands(t *testing.T) {
+
+	// initialize test case
+	t.Log("DistanceBands Test: Expected Matrix = {{3 3 3 [0 1 2 1 1 2 2 2 2]} 3 3}")
+
+	// initialize expected value
+	var expValueVector = []float64{
+		0.0, 1.0, 2.0,
+		1.0, 1.0, 2.0,
+		2.0, 2.0, 2.0}
+	expValueMatrix := mat64.NewDense(3, 3, expValueVector)
+
+	// initialize test case variables
+	var aSubs = []int{0, 0}
+	var bandCount int = 2
+	searchDomainMatrix := mat64.NewDense(3, 3, nil)
+
+	// compute distance matrix !! dependent on AllDistance test result !!
+	distanceMatrix := AllDistance(aSubs, searchDomainMatrix)
+
+	// perform test case
+	testCase := DistanceBands(bandCount, distanceMatrix)
+
+	// log test result
+	if testCase.Equals(expValueMatrix) {
+		t.Log("DistanceBands Test: Computed Matrix =", *testCase)
+	} else {
+		t.Error("DistanceBands Test: Computed Matrix =", *testCase)
+	}
+}
+
+// test BandMask
+func TestBandMask(t *testing.T) {
+
+	// initialize test case
+	t.Log("BandMask Test: Expected Matrix = {{3 3 3 [0 0 0 0 1 0 0 0 0]} 3 3}")
+
+	// initialize expected value
+	var expValueVector = []float64{
+		0.0, 0.0, 0.0,
+		0.0, 1.0, 0.0,
+		0.0, 0.0, 0.0}
+	expValueMatrix := mat64.NewDense(3, 3, expValueVector)
+
+	// initialize test case variables
+	var aSubs = []int{0, 0}
+	var bandCount int = 2
+	var bandValue float64 = 1.0
+	searchDomainMatrix := mat64.NewDense(3, 3, nil)
+
+	// compute distance matrix !! dependent on AllDistance test result !!
+	distanceMatrix := AllDistance(aSubs, searchDomainMatrix)
+
+	// compute band matrix !! dependent on DistanceBands test result!!
+	bandMatrix := DistanceBands(bandCount, distanceMatrix)
+
+	// perform test case
+	testCase := BandMask(bandValue, bandMatrix)
+
+	// log test results
+	if testCase.Equals(expValueMatrix) {
+		t.Log("BandMask Test: Computed Matrix =", *testCase)
+	} else {
+		t.Error("BandMask Test: Computed Matrix =", *testCase)
+	}
+}
+
+// test NonZeroSubs
+func TestNonZeroSubs(t *testing.T) {
+
+	// initialize test case
+	t.Log("NonZeroSubs Test: Expected Vector = [[1 1]]")
+
+	// initialize expected value
+	expValueVector := make([][]int, 1)
+	expValueVector[0] = []int{1, 1}
+
+	// initialize test case variables
+	var aSubs = []int{0, 0}
+	var bandCount int = 2
+	var bandValue float64 = 1.0
+	searchDomainMatrix := mat64.NewDense(3, 3, nil)
+
+	// compute distance matrix !! dependent on AllDistance test result !!
+	distanceMatrix := AllDistance(aSubs, searchDomainMatrix)
+
+	// compute band matrix !! dependent on DistanceBands test result!!
+	bandMatrix := DistanceBands(bandCount, distanceMatrix)
+
+	// compute band mask !! dependent on BandMask test result!!
+	bandMask := BandMask(bandValue, bandMatrix)
+
+	// perform test case
+	testCase := NonZeroSubs(bandMask)
+
+	// log test results
+	if testCase[0][0] == expValueVector[0][0] && testCase[0][1] == expValueVector[0][1] {
+		t.Log("NonZeroSubs Test: Computed Vector =", testCase)
+	} else {
+		t.Error("NonZeroSubs Test: Computed Vector =", testCase)
+	}
+}
+
+// test FindSubs
+func TestFindSubs(t *testing.T) {
+
+	// initialize test case
+	t.Log("FindSubs Test: Expected Vector = [[0 0]]")
+
+	// initialize expected value
+	expValueVector := make([][]int, 1)
+	expValueVector[0] = []int{0, 0}
+
+	// initialize test case variables
+	var inputValue float64 = 0.0
+	var aSubs = []int{0, 0}
+	searchDomainMatrix := mat64.NewDense(3, 3, nil)
+
+	// compute distance matrix !! dependent on AllDistance test result !!
+	distanceMatrix := AllDistance(aSubs, searchDomainMatrix)
+
+	// perform test case
+	testCase := FindSubs(inputValue, distanceMatrix)
+
+	// log test results
+	if testCase[0][0] == expValueVector[0][0] && testCase[0][1] == expValueVector[0][1] {
+		t.Log("FindSubs Test: Computed Vector =", testCase)
+	} else {
+		t.Error("FindSubs Test: Computed Vector =", testCase)
+	}
+}
+
+// test Orientation
+func TestOrientation(t *testing.T) {
+
+	// initialize test case
+	t.Log("Orientation Test: Expected Vector = [1 1]")
+
+	// initialize expected value
+	var expValueVector = []int{1, 1}
+
+	// initialize test case variables
+	var aSubs = []int{0, 0}
+	var bSubs = []int{2, 2}
+
+	// perform test case
+	testCase := Orientation(aSubs, bSubs)
+
+	// log test results
+	if testCase[0] == expValueVector[0] && testCase[1] == expValueVector[1] {
+		t.Log("Orientation Test: Computed Vector =", testCase)
+	} else {
+		t.Error("Orientation Test: Computed Vector =", testCase)
+	}
+}
+
+// test OrientationMask
+func TestOrientationMask(t *testing.T) {
+
+	// initialize test case
+	t.Log("OrientationMask Test: Expected Matrix = {{3 3 3 [0 0 0 0 1 0 0 0 0]} 3 3}")
+
+	// initialize expected value
+	var expValueVector = []float64{
+		0.0, 0.0, 0.0,
+		0.0, 1.0, 0.0,
+		0.0, 0.0, 0.0}
+	expValueMatrix := mat64.NewDense(3, 3, expValueVector)
+
+	// initialize test case variables
+	var aSubs = []int{0, 0}
+	var bSubs = []int{2, 2}
+	searchDomainMatrix := mat64.NewDense(3, 3, nil)
+
+	// perform test case
+	testCase := OrientationMask(aSubs, bSubs, searchDomainMatrix)
+
+	// log test results
+	if testCase.Equals(expValueMatrix) {
+		t.Log("OrientationMask Test: Computed Matrix =", *testCase)
+	} else {
+		t.Error("OrientationMask Test: Computed Matrix =", *testCase)
+	}
+}
+
+// test Bresenham
+func TestBresenham(t *testing.T) {
+
+	// initialize test case
+	t.Log("Bresenham Test: Expected Vector = [[0 0] [1 1] [2 2]]")
+
+	// initialize expected value
+	expValueVector := make([][]int, 1)
+	expValueVector[0] = []int{0, 0}
+	expValueVector = append(expValueVector, []int{1, 1})
+	expValueVector = append(expValueVector, []int{2, 2})
+
+	// initialize test case variables
+	var aSubs = []int{0, 0}
+	var bSubs = []int{2, 2}
+	var testBool bool = true
+
+	// perform test case
+	testCase := Bresenham(aSubs, bSubs)
+
+	// examine test results
+	for i := 0; i < len(testCase); i++ {
+		if testCase[i][0] != expValueVector[i][0] || testCase[i][1] != expValueVector[i][1] {
+			testBool = false
+			break
+		}
+	}
+
+	// log test results
+	if testBool == true {
+		t.Log("Bresenham Test: Computed Vector =", testCase)
+	} else {
+		t.Error("Bresenham Test: Computed Vector =", testCase)
+	}
+}
+
+// test NeighborhoodSubs
+func TestNeighborhoodSubs(t *testing.T) {
+
+	// initialize test case
+	t.Log("NeighborhoodSubs Test: Expected Vector = [[0 0] [0 1] [0 2] [1 0] [1 1] [1 2] [2 0] [2 1] [2 2]]")
+
+	// initialize expected value
+	expValueVector := make([][]int, 0)
+	for i := 0; i < 3; i++ {
+		for j := 0; j < 3; j++ {
+			expValueVector = append(expValueVector, []int{i, j})
+		}
+	}
+
+	// initialize test ccase variables
+	var aSubs = []int{1, 1}
+	var testBool bool = true
+
+	// perform test case
+	testCase := NeighborhoodSubs(aSubs)
+
+	// examine test results
+	for k := 0; k < len(testCase); k++ {
+		if testCase[k][0] != expValueVector[k][0] || testCase[k][1] != expValueVector[k][1] {
+			testBool = false
+			break
+		}
+	}
+
+	// log test results
+	if testBool == true {
+		t.Log("NeighborhoodSubs Test: Computed Vector =", testCase)
+	} else {
+		t.Error("NeighborhoodSubs Test: Computed Vector =", testCase)
+	}
+}
+
+// test ValidateSubDomain
+func TestValidateSubDomain(t *testing.T) {
+
+	// initialize test case
+	t.Log("ValidateSubDomain: Expecte Value = true")
+
+	// initialize expected values
+	var invalidVector = []float64{
+		0.0, 0.0, 0.0, 0.0, 0.0,
+		0.0, 1.0, 0.0, 1.0, 0.0,
+		0.0, 0.0, 0.0, 1.0, 0.0,
+		0.0, 1.0, 1.0, 1.0, 0.0,
+		0.0, 0.0, 0.0, 0.0, 0.0}
+	invalidMatrix := mat64.NewDense(5, 5, invalidVector)
+	var validVector = []float64{
+		0.0, 0.0, 0.0, 0.0, 0.0,
+		0.0, 1.0, 1.0, 1.0, 0.0,
+		0.0, 1.0, 1.0, 1.0, 0.0,
+		0.0, 1.0, 1.0, 1.0, 0.0,
+		0.0, 0.0, 0.0, 0.0, 0.0}
+	validMatrix := mat64.NewDense(5, 5, validVector)
+
+	// initialize test case variables
+	var subSource = []int{1, 1}
+	var subDestin = []int{2, 3}
+	var testCase1 bool
+	var testCase2 bool
+
+	// perform test cases
+	testCase1 = ValidateSubDomain(subSource, subDestin, invalidMatrix)
+	testCase2 = ValidateSubDomain(subSource, subDestin, validMatrix)
+
+	// log test results
+	if testCase1 == false && testCase2 == true {
+		t.Log("ValidateSubDomain Test: Computed Value =", true)
+	} else {
+		t.Error("ValidateSubDomain Test: Computed Value =", false)
+	}
+}
+
+// test ValidateTabu
+func TestValidateTabu(t *testing.T) {
+
+	// initialize test case
+	t.Log("ValidateTabu Test: Expected Value = true")
+
+	// initialize expected values
+	var invalidVector = []float64{
+		0.0, 0.0, 0.0, 0.0, 0.0,
+		0.0, 0.0, 0.0, 0.0, 0.0,
+		0.0, 0.0, 0.0, 0.0, 0.0,
+		0.0, 0.0, 0.0, 0.0, 0.0,
+		0.0, 0.0, 0.0, 0.0, 0.0}
+	invalidMatrix := mat64.NewDense(5, 5, invalidVector)
+	var validVector = []float64{
+		0.0, 0.0, 0.0, 0.0, 0.0,
+		0.0, 1.0, 1.0, 1.0, 0.0,
+		0.0, 1.0, 1.0, 1.0, 0.0,
+		0.0, 1.0, 1.0, 1.0, 0.0,
+		0.0, 0.0, 0.0, 0.0, 0.0}
+	validMatrix := mat64.NewDense(5, 5, validVector)
+
+	// initialize test case variables
+	var currentSubs = []int{2, 2}
+	var testCase1 bool
+	var testCase2 bool
+
+	// perform test cases
+	testCase1 = ValidateTabu(currentSubs, invalidMatrix)
+	testCase2 = ValidateTabu(currentSubs, validMatrix)
+	testBool := testCase1 == false && testCase2 == true
+
+	// log test results
+	if testBool {
+		t.Log("ValidateTabu Test: Computed Value =", testBool)
+	} else {
+		t.Error("ValidateTabu Test: Computed Value =", testBool)
+	}
+}
+
+// test DigitCount
+func TestDigitCount(t *testing.T) {
+
+	// initialize test case
+	t.Log("DigitCount Test: Expected Value = 10")
+
+	// initialize expected values
+	var expValue int = 10
+
+	// initialize test case variables
+	input := 10000000000
+
+	// peform test case
+	testCase := DigitCount(input)
+
+	// log test results
+	if testCase == expValue {
+		t.Log("DigitCount Test: Computed Value =", testCase)
+	} else {
+		t.Error("DigitCount Test: Computed Value =", testCase)
+	}
+}
+
+\end{lstlisting}
+
+\newpage
+
+<operators.go>
+
+\begin{lstlisting}[basicstyle=\tiny]
+
+// Copyright ©2015 The corridor Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.package main
+
+package corridor
+
+import (
+	"math"
+	"math/rand"
+	"time"
+
+	"github.com/gonum/matrix/mat64"
+)
+
+// fitness function to generate the total fitness and chromosome
+// fitness values for a given input chromosome
+func ChromosomeFitness(inputChromosome *Chromosome, 
+    inputObjectives *MultiObjective) (outputChromosome *Chromosome) {
+
+	// get chromosome length
+	chromLen := len(inputChromosome.Subs)
+
+	// clear current chromosome fitness values
+	inputChromosome.Fitness = make([][]float64, inputObjectives.ObjectiveCount)
+	for i := 0; i < inputObjectives.ObjectiveCount; i++ {
+		inputChromosome.Fitness[i] = make([]float64, len(inputChromosome.Subs))
+	}
+
+	// initialize current & aggregate fitness
+	var aggFit float64 = 0.0
+	var curFit float64 = 0.0
+
+	// evaluate chromosome length and objectives to compute fitnesses
+	for i := 0; i < inputObjectives.ObjectiveCount; i++ {
+		for j := 0; j < chromLen; j++ {
+			curFit = 
+			    inputObjectives.Objectives[i].Matrix.At(inputChromosome.Subs[j][0], 
+			        inputChromosome.Subs[j][1])
+			inputChromosome.Fitness[i][j] = curFit
+			inputChromosome.TotalFitness[i] = inputChromosome.TotalFitness[i] + curFit
+		}
+
+		// compute aggregate fitness
+		aggFit = aggFit + inputChromosome.TotalFitness[i]
+	}
+
+	// calculate aggregate fitness
+	inputChromosome.AggregateFitness = aggFit
+
+	// return outputs
+	return inputChromosome
+}
+
+// fitness function generate the mean fitness values for all of the chromosomes
+// in a given population
+func PopulationFitness(inputPopulation *Population, 
+    inputParameters *Parameters, 
+    inputObjectives *MultiObjective) (outputPopulation *Population) {
+
+	// initialize output
+	var cumFit float64 = 0.0
+	var aggMeanFit float64 = 0.0
+
+	// iterate over the different objectives and drain channel to compute fitness
+	for i := 0; i < inputObjectives.ObjectiveCount; i++ {
+		for j := 0; j < inputParameters.PopSize; j++ {
+
+			// read current chromosome from channel
+			curChrom := <-inputPopulation.Chromosomes
+
+			// compute cumulative fitness
+			cumFit = cumFit + curChrom.TotalFitness[i]
+
+			// recieve from channel
+			inputPopulation.Chromosomes <- curChrom
+		}
+
+		// compute mean from cumulative
+		inputPopulation.MeanFitness[i] = cumFit / float64(inputParameters.PopSize)
+
+		// compute aggreage mean fitness
+		aggMeanFit = aggMeanFit + inputPopulation.MeanFitness[i]
+	}
+
+	// write aggregate mean fitness to output
+	inputPopulation.AggregateMeanFitness = aggMeanFit
+
+	// return output
+	return inputPopulation
+}
+
+// selection operator selects between two chromosomes with a
+// probability of the most fit chromosome being selected
+// determined by the input selection probability ratio
+func ChromosomeSelection(chrom1, chrom2 *Chromosome, 
+    selectionProb float64) (selectedChrom *Chromosome) {
+
+	// initialize output
+	output := chrom1
+
+	// get current time for random number seed
+	rand.Seed(time.Now().UnixNano())
+
+	// generate random number to determine selection result
+	dec := rand.Float64()
+
+	// perform conditional selection
+	if dec > selectionProb { // normal
+		if chrom1.AggregateFitness > chrom2.AggregateFitness {
+			output = chrom1
+		} else {
+			output = chrom2
+		}
+	} else { // inverted
+		if chrom1.AggregateFitness > chrom2.AggregateFitness {
+			output = chrom2
+		} else {
+			output = chrom1
+		}
+	}
+
+	// return output
+	return output
+}
+
+// population selection operator selects half of the input
+// population for reproduction based upon comparative
+// fitness and some randomized input selection fraction
+func PopulationSelection(inputPopulation *Population, 
+    inputParameters *Parameters) (selection chan *Chromosome) {
+
+	// initialize selection channel size
+	selSize := int(math.Floor(float64(cap(inputPopulation.Chromosomes)) * inputParameters.SelFrac))
+
+	// initialize selection channel
+	output := make(chan *Chromosome, selSize)
+
+	// initialize selection probability
+	selProb := inputParameters.SelProb
+
+	// initialize selection loop
+	for i := 0; i < selSize; i++ {
+		chrom1 := <-inputPopulation.Chromosomes
+		chrom2 := <-inputPopulation.Chromosomes
+
+		go func(chrom1, chrom2 *Chromosome) {
+			// write selection to output channel
+			output <- ChromosomeSelection(chrom1, chrom2, selProb)
+		}(chrom1, chrom2)
+	}
+
+	// return selection channel
+	return output
+}
+
+// intersection determines whether or not the subscripts
+// associated with two input chromosomes share any in
+// values in common and reports their relative indices
+func ChromosomeIntersection(subs1, subs2 [][]int) (subs1Indices, subs2Indices []int) {
+
+	// initialize output index slice
+	output1 := make([]int, 0)
+	output2 := make([]int, 0)
+
+	// initialize subscript lengths
+	len1 := len(subs1)
+	len2 := len(subs2)
+
+	// enter intersection loop
+	for i := 0; i < len1; i++ {
+		for j := 0; j < len2; j++ {
+			if subs1[i][0] == subs2[j][0] && subs1[i][1] == subs2[j][1] {
+				output1 = append(output1, i)
+				output2 = append(output2, j)
+			}
+		}
+	}
+
+	// return intersection output
+	return output1, output2
+
+}
+
+// crossover operator performs the single point crossover
+// operation for two input chromosomes that have
+// previously been selected from a source population
+func ChromosomeCrossover(chrom1Ind, chrom2Ind []int, 
+    chrom1Subs, chrom2Subs [][]int) (crossoverChrom [][]int) {
+
+	// initialize maximum length
+	maxLen := len(chrom1Subs) + len(chrom2Subs)
+
+	// initialize output
+	output := make([][]int, 0, maxLen)
+
+	// get current time for random number seed
+	rand.Seed(time.Now().UnixNano())
+
+	var r int
+
+	// generate random number to determine selection result
+	// while screening out initial source index match
+	for {
+		r = rand.Intn(len(chrom1Ind) - 1)
+		if r == 0 {
+			continue
+		} else {
+			break
+		}
+	}
+
+	// generate subscript slice 1
+	for i := 0; i < (chrom1Ind[r] + 1); i++ {
+		output = append(output, chrom1Subs[i])
+	}
+
+	// generate subscript slice 2
+	for j := (chrom2Ind[r] + 1); j < len(chrom2Subs); j++ {
+		output = append(output, chrom2Subs[j])
+	}
+
+	// return output
+	return output
+
+}
+
+// selection crossover operator performs a single part
+// crossover on each of the individuals provided in an
+// input selection channel of chromosomes
+func SelectionCrossover(inputSelection chan *Chromosome, 
+    inputParameters *Parameters, 
+    inputObjectives *MultiObjective, 
+    inputDomain *Domain) (crossover chan *Chromosome) {
+
+	// initialize crossover channel
+	output := make(chan *Chromosome, inputParameters.PopSize)
+
+	// initialize crossover loop
+	for i := 0; i < inputParameters.PopSize; i++ {
+		for {
+			// extract chromosomes
+			chrom1 := <-inputSelection
+			chrom2 := <-inputSelection
+
+			// initialize empty index slices
+			var chrom1Ind []int
+			var chrom2Ind []int
+
+			// initialize empty chromosome
+			empChrom := NewEmptyChromosome(inputDomain, inputObjectives)
+
+			// check for valid crossover point
+			chrom1Ind, chrom2Ind = ChromosomeIntersection(chrom1.Subs, chrom2.Subs)
+
+			// resample chromosomes if no intersection
+			if len(chrom1Ind) > 2 {
+				empChrom.Subs = ChromosomeCrossover(chrom1Ind, chrom2Ind, chrom1.Subs, chrom2.Subs)
+				empChrom = ChromosomeFitness(empChrom, inputObjectives)
+				output <- empChrom
+				inputSelection <- chrom1
+				inputSelection <- chrom2
+				break
+			} else {
+				inputSelection <- chrom2
+				inputSelection <- chrom1
+				continue
+			}
+		}
+	}
+
+	// return output
+	return output
+}
+
+// mutationLocus to randomly select a mutation locus and return the adjacent
+// loci along the length of the chromosome
+func MutationLoci(inputChromosome *Chromosome) (previousLocus, 
+    mutationLocus, nextLocus []int, 
+    mutationIndex int) {
+
+	// compute chromosome length
+	lenChrom := len(inputChromosome.Subs)
+
+	// seed random number generator
+	rand.Seed(time.Now().UnixNano())
+
+	// randomly select mutation index
+	mutIndex := rand.Intn(lenChrom-4) + 2
+
+	// get mutation locui subscripts from mutIndex
+	mutLocus := inputChromosome.Subs[mutIndex]
+	prvLocus := inputChromosome.Subs[mutIndex-1]
+	nxtLocus := inputChromosome.Subs[mutIndex+1]
+
+	// return output
+	return prvLocus, mutLocus, nxtLocus, mutIndex
+}
+
+// mutation sub domain returns the subdomain to be used for the mutation
+// specific directed walk procedure
+func MutationSubDomain(previousLocus, 
+    mutationLocus, nextLocus []int, 
+    inputDomain *mat64.Dense) (outputSubDomain *mat64.Dense) {
+
+	// generate mutation locus neighborhood indices
+	nInd := NeighborhoodSubs(mutationLocus)
+
+	// initialize iterator
+	var n int = 0
+
+	// initialize sub domain matrix
+	subMat := mat64.NewDense(5, 5, nil)
+
+	// clean sub domain
+	for i := 0; i < 5; i++ {
+		for j := 0; j < 5; j++ {
+			if i == 0 {
+				subMat.Set(i, j, 0.0)
+			} else if i == 4 {
+				subMat.Set(i, j, 0.0)
+			} else if j == 0 {
+				subMat.Set(i, j, 0.0)
+			} else if j == 4 {
+				subMat.Set(i, j, 0.0)
+			} else if nInd[n][0] == previousLocus[0] && nInd[n][1] == previousLocus[1] {
+				subMat.Set(i, j, 1.0)
+				// iterate counter
+				n += 1
+			} else if nInd[n][0] == nextLocus[0] && nInd[n][1] == nextLocus[1] {
+				subMat.Set(i, j, 1.0)
+				// iterate counter
+				n += 1
+			} else {
+				subMat.Set(i, j, inputDomain.At(nInd[n][0], nInd[n][1]))
+				// iterate counter
+				n += 1
+			}
+		}
+	}
+
+	// return output
+	return subMat
+}
+
+// function to generate a mutation within a given chromosome at a specified
+// number of mutation loci
+func ChromosomeMutation(inputChromosome *Chromosome, 
+    inputDomain *Domain, 
+    inputParameters *Parameters, 
+    inputObjectives *MultiObjective) (outputChromosome *Chromosome) {
+
+	// compute chromosome length
+	lenChrom := len(inputChromosome.Subs)
+
+	// initialize output chromosome
+	output := inputChromosome
+
+	// initialize reference domain matrix
+	refDomain := mat64.NewDense(inputDomain.Rows, inputDomain.Cols, nil)
+
+	// clone input domain matrix
+	refDomain.Clone(inputDomain.Matrix)
+
+	// block out cells on current chromosome
+	for k := 0; k < lenChrom; k++ {
+		refDomain.Set(inputChromosome.Subs[k][0], inputChromosome.Subs[k][1], 0.0)
+	}
+
+	// enter unbounded mutation search loop
+	for {
+		// generate mutation loci
+		prvLocus, mutLocus, nxtLocus, mutIndex := MutationLoci(inputChromosome)
+
+		// first check if deletion is valid, else perform mutation
+		if Distance(prvLocus, nxtLocus) < 1.5 {
+
+			// perform simple deletion of mutation index
+			output.Subs = append(output.Subs[:mutIndex], output.Subs[(mutIndex+1):]...)
+
+			// loop over objective and remove fitness values
+			for r := 0; r < inputObjectives.ObjectiveCount; r++ {
+				output.Fitness[r] = 
+				    append(output.Fitness[r][:mutIndex], output.Fitness[r][(mutIndex+1):]...)
+			}
+			break
+		} else {
+
+			// generate mutation subdomain
+			subMat := MutationSubDomain(prvLocus, mutLocus, nxtLocus, refDomain)
+
+			// generate sub source and sub destination
+			subSource := make([]int, 2)
+			subDestin := make([]int, 2)
+			subSource[0] = prvLocus[0] - mutLocus[0] + 2
+			subSource[1] = prvLocus[1] - mutLocus[1] + 2
+			subDestin[0] = nxtLocus[0] - mutLocus[0] + 2
+			subDestin[1] = nxtLocus[1] - mutLocus[1] + 2
+
+			// generate subdomain from sub matrix and generate sub basis
+			subDomain := NewDomain(subMat)
+			subParams := NewParameters(subSource, subDestin, 1, 1, inputParameters.RndCoef)
+			subBasis := NewBasis(subSource, subDestin, subDomain)
+
+			// check validity of sub domain
+			subDomainTest := ValidateSubDomain(subSource, subDestin, subMat)
+
+			// resample if subdomain is invalid
+			if subDomainTest == false {
+				continue
+			} else {
+
+				// generate directed walk based mutation
+				subWlk, tabuTest := 
+				    MutationWalk(subParams.SrcSubs, subParams.DstSubs, subDomain, subParams, subBasis)
+
+				// if tabu test fails abort mutation and restart
+				if tabuTest == false {
+					subWlk = make([][]int, 1)
+					continue
+				} else {
+
+					subLen := len(subWlk)
+					subFit := make([][]float64, inputObjectives.ObjectiveCount)
+
+					// translate subscripts and evaluate fitnesses
+					for i := 0; i < inputObjectives.ObjectiveCount; i++ {
+
+						// initialize subfit section
+						subFit[i] = make([]float64, subLen)
+
+						// translate subscripts and compute sub walk fitness
+						for j := 0; j < subLen; j++ {
+							if i == 0 {
+								subWlk[j][0] = subWlk[j][0] - 2 + mutLocus[0]
+								subWlk[j][1] = subWlk[j][1] - 2 + mutLocus[1]
+							}
+
+							subFit[i][j] = 
+							    inputObjectives.Objectives[i].Matrix.At(subWlk[j][0], 
+							        subWlk[j][1])
+						}
+
+						// delete mutation locus from fitnesses
+						output.Fitness[i] = append(output.Fitness[i][:mutIndex], 
+						    output.Fitness[i][(mutIndex+1):]...)
+
+						// insert sub walk section into original chromosome fitnesses
+						output.Fitness[i] = append(output.Fitness[i][:mutIndex-1], 
+						    append(subFit[i], output.Fitness[i][mutIndex+1:]...)...)
+					}
+
+					// delete mutation locus from subs
+					output.Subs = append(output.Subs[:mutIndex], output.Subs[(mutIndex+1):]...)
+
+					// insert new sub walk subscripts into subs
+					output.Subs = 
+					    append(output.Subs[:mutIndex-1], 
+					        append(subWlk, output.Subs[mutIndex+1:]...)...)
+					break
+				}
+			}
+		}
+
+	}
+
+	// return output
+	return output
+}
+
+// function to generate multiple mutations on multiple separate loci on the same
+// input chromosome
+func ChromosomeMultiMutation(inputChromosome *Chromosome, 
+    inputDomain *Domain, 
+    inputParameters *Parameters, 
+    inputObjectives *MultiObjective) (outputChromosome *Chromosome) {
+
+	// loop through mutation count
+	for i := 0; i < inputParameters.MutaCnt; i++ {
+		inputChromosome = ChromosomeMutation(inputChromosome, inputDomain, inputParameters, inputObjectives)
+	}
+
+	// return output
+	return inputChromosome
+}
+
+// function to generate mutations within a specified fraction of an input
+// population with those chromosomes being selected at random
+func PopulationMutation(inputChromosomes chan *Chromosome, 
+    inputParameters *Parameters, 
+    inputObjectives *MultiObjective, 
+    inputDomain *Domain) (outputChromosomes chan *Chromosome) {
+
+	// calculate the total number of chromosomes that are to receive mutations
+	mutations := int(math.Floor(float64(inputParameters.PopSize) * float64(inputParameters.MutaFrc)))
+
+	// seed random number generator
+	rand.Seed(time.Now().UnixNano())
+
+	// initialize mutation selection test variable and iteration counter variable
+	var iter int
+	var mutTest int
+
+	// initialize throttle size
+	conc := make(chan bool, inputParameters.ConSize)
+
+	// initialize selection loop
+	for j := 0; j < inputParameters.PopSize; j++ {
+
+		// get current chromosome from channel
+		curChrom := <-inputChromosomes
+
+		// generate random mutation selection binary integer
+		mutTest = rand.Intn(2)
+
+		// screen on mutation indices
+		if mutTest == 1 {
+
+			// write to control channel
+			conc <- true
+
+			// launch go routines
+			go func(curChrom *Chromosome, 
+			    inputDomain *Domain, 
+			    inputParameters *Parameters, 
+			    inputObjectives *MultiObjective) {
+				defer func() { <-conc }()
+				curChrom = ChromosomeMultiMutation(curChrom, inputDomain, inputParameters, inputObjectives)
+			}(curChrom, inputDomain, inputParameters, inputObjectives)
+
+			// update iterator
+			iter += 1
+
+			// return current chromosome back to channel
+			inputChromosomes <- curChrom
+
+		} else {
+
+			// return current chromosome back to channel
+			inputChromosomes <- curChrom
+		}
+
+		// break once the desired number of mutants has been generated
+		if iter == mutations {
+			break
+		}
+	}
+
+	// cap parallelism at concurrency limit
+	for j := 0; j < cap(conc); j++ {
+		conc <- true
+	}
+
+	// return selection channel
+	return inputChromosomes
+}
+
+// population evolution operator generates a new population
+// from an input population using the selection and crossover operators
+func PopulationEvolution(inputPopulation *Population, 
+    inputDomain *Domain, 
+    inputParameters *Parameters, 
+    inputObjectives *MultiObjective) (outputPopulation *Population) {
+
+	// initialize new empty population
+	output := NewEmptyPopulation(inputPopulation.Id+1, inputObjectives)
+
+	// perform population selection
+	popSel := PopulationSelection(inputPopulation, inputParameters)
+
+	// perform selection crossover
+	selCrs := SelectionCrossover(popSel, inputParameters, inputObjectives, inputDomain)
+
+	// fill empty population
+	popMut := PopulationMutation(selCrs, inputParameters, inputObjectives, inputDomain)
+
+	// assign channel to output population
+	output.Chromosomes = popMut
+
+	// return output
+	return output
+}
+
+\end{lstlisting}
+
+\newpage
+
+<random.go>
+
+\begin{lstlisting}[basicstyle=\tiny]
+
+// Copyright ©2015 The corridor Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
+package corridor
+
+import (
+	"math"
+	"math/rand"
+	"time"
+
+	"github.com/gonum/matrix/mat64"
+)
+
+// multivariatenormalrandom generates pairs of bivariate normally distributed
+// random numbers given an input mean vector and covariance matrix
+func MultiVariateNormalRandom(mu *mat64.Dense, sigma *mat64.SymDense) (rndsmp *mat64.Dense) {
+
+	// initialize vector slices
+	o := make([]float64, 2)
+	n := make([]float64, 2)
+
+	// generate random numbers from normal distribution, prohibit [0,0]
+	// combinations
+	rand.Seed(time.Now().UnixNano())
+
+	// enter loop
+	for i := 0; i < 2; i++ {
+		n[i] = rand.NormFloat64()
+	}
+
+	// convert to matrix type
+	rnd := mat64.NewDense(2, 1, n)
+	output := mat64.NewDense(2, 1, o)
+
+	// perform cholesky decomposition on covariance matrix
+	lower := mat64.NewTriDense(2, false, nil)
+	lower.Cholesky(sigma, true)
+
+	// compute output
+	output.Mul(lower, rnd)
+	output.Add(output, mu)
+
+	//return final output
+	return output
+}
+
+// fixmultivariatenormalrandom converts an input vector of bivariate normally
+// distributed random numbers into a version where the values have been fixed
+// to a [-1, 0 ,1] range
+func FixMultiVariateNormalRandom(rndsmp *mat64.Dense) (fixsmp *mat64.Dense) {
+
+	// initialize vector slice
+	o := make([]float64, 2)
+
+	// write up down movement direction
+	if rndsmp.At(0, 0) > 1.0 {
+		o[0] = 1
+	} else if rndsmp.At(0, 0) >= -1.0 && rndsmp.At(0, 0) <= 1.0 {
+		o[0] = 0
+	} else if rndsmp.At(0, 0) < -1.0 {
+		o[0] = -1
+	}
+
+	// write left right movement direction
+	if rndsmp.At(1, 0) > 1.0 {
+		o[1] = 1
+	} else if rndsmp.At(1, 0) >= -1.0 && rndsmp.At(1, 0) <= 1.0 {
+		o[1] = 0
+	} else if rndsmp.At(1, 0) < -1.0 {
+		o[1] = -1
+	}
+
+	// convert to matrix type
+	output := mat64.NewDense(1, 2, o)
+
+	// return final output
+	return output
+}
+
+// newrandom repeatedly generates a new random sample from mvrnd and then fixes
+// it using fixrandom until the sample is comprised of a non [0, 0] case
+func NewRandom(mu *mat64.Dense, sigma *mat64.SymDense) (newRand []int) {
+
+	// initialize rndsmp and fixsmp and output variables
+	rndsmp := mat64.NewDense(2, 1, nil)
+	fixsmp := mat64.NewDense(1, 2, nil)
+
+	// generate random vectors prohibiting zero-zero cases
+	for {
+		rndsmp = MultiVariateNormalRandom(mu, sigma)
+		fixsmp = FixMultiVariateNormalRandom(rndsmp)
+		if fixsmp.At(0, 0) == 0 && fixsmp.At(0, 1) == 0 {
+			continue
+		} else {
+			break
+		}
+	}
+
+	// initialize output
+	output := make([]int, 2)
+
+	// write output values
+	output[0] = int(fixsmp.At(0, 0))
+	output[1] = int(fixsmp.At(0, 1))
+
+	// return final output
+	return output
+}
+
+// newmu generates a matrix representation of mu that reflects the
+// spatial orentiation between the input current subscript and the
+// destination subscript
+func NewMu(curSubs, dstSubs []int) (mu *mat64.Dense) {
+
+	// compute mu as the orientation vector
+	orientVec := Orientation(curSubs, dstSubs)
+
+	// convert mu to float
+	var muVec = []float64{float64(orientVec[0]), float64(orientVec[1])}
+
+	// initialize matrix output
+	output := mat64.NewDense(2, 1, muVec)
+
+	// return final output
+	return output
+}
+
+// newsigma generates a matrix representation of sigma that reflects the
+// number of iterations in the sampling process as well as the distance
+// from the basis euclidean solution
+func NewSigma(iterations int, randomness, distance float64) (sigma *mat64.SymDense) {
+
+	// impose lower bound on distance
+	if distance < 1 {
+		distance = 1.0
+	}
+
+	// set numerator
+	var num float64 = 1.0
+
+	// initialize covariance
+	var cov float64
+
+	// compute covariance
+	if distance == 1.0 {
+		cov = 1.0
+	} else {
+		cov = math.Pow(distance, (num/randomness)) / math.Pow(float64(iterations), (num/randomness))
+	}
+
+	// initialize matrix output
+	output := mat64.NewSymDense(2, nil)
+
+	// set values
+	output.SetSym(0, 0, cov)
+	output.SetSym(0, 1, 0.0)
+	output.SetSym(1, 0, 0.0)
+	output.SetSym(1, 1, cov)
+
+	// return final output
+	return output
+}
+
+// newsubs generates a feasible new subscript value set within the
+// input search domain
+func NewSubs(curSubs, destinationSubs []int, 
+    curDist float64, 
+    searchParameters *Parameters, 
+    searchDomain *Domain) (subs []int) {
+
+	// initialize iteration counter
+	var iterations int = 1
+
+	// initialize output
+	output := make([]int, 2)
+
+	// generate and fix a bivariate normally distributed random vector
+	// prohibit all zero cases and validate using the search domain
+	for {
+
+		// generate mu and sigma values
+		mu := NewMu(curSubs, destinationSubs)
+		sigma := NewSigma(iterations, searchParameters.RndCoef, curDist)
+
+		// generate fixed random bivariate normally distributed numbers
+		try := NewRandom(mu, sigma)
+
+		// write output
+		output[0] = curSubs[0] + try[0]
+		output[1] = curSubs[1] + try[1]
+
+		// DEBUG
+		// test if currentIndex is forbidden
+		if searchDomain.Matrix.At(output[0], output[1]) == 0.0 {
+			iterations += 1
+			continue
+		}
+
+		// test if currentIndex inside search domain
+		if output[0] > searchDomain.Rows-1 || 
+		    output[1] > searchDomain.Cols-1 || 
+		    output[0] < 0 || output[1] < 0 {
+			    iterations += 1
+			    continue
+		} else {
+			break
+		}
+	}
+
+	// return final output
+	return output
+}
+
+// directedwalk generates a new directed walk connecting a source subscript to a
+// destination subscript within the context of an input search domain
+func DirectedWalk(sourceSubs, destinationSubs []int, 
+    searchDomain *Domain, 
+    searchParameters *Parameters, 
+    basisSolution *Basis) (subs [][]int) {
+
+	// initialize chromosomal 2D slice with source subscript as first element
+	output := make([][]int, 1, basisSolution.MaxLen)
+	output[0] = make([]int, 2)
+	output[0][0] = sourceSubs[0]
+	output[0][1] = sourceSubs[1]
+
+	// enter unbounded for loop
+	for {
+
+		// initialize new tabu matrix
+		tabu := mat64.NewDense(searchDomain.Rows, searchDomain.Cols, nil)
+		for i := 0; i < searchDomain.Rows; i++ {
+			for j := 0; j < searchDomain.Cols; j++ {
+
+				if i == 0 || i == searchDomain.Rows-1 || j == 0 || j == searchDomain.Cols-1 {
+					tabu.Set(i, j, 0.0)
+				} else {
+					tabu.Set(i, j, 1.0)
+				}
+			}
+		}
+
+		//tabu.Clone(searchDomain.Matrix)
+		tabu.Set(sourceSubs[0], sourceSubs[1], 0.0)
+
+		// initialize current subscripts, distance, try, and iteration counter
+		curSubs := make([]int, 2)
+		var curDist float64
+		var try []int
+
+		// enter bounded for loop
+		for i := 0; i < basisSolution.MaxLen; i++ {
+
+			// get current subscripts
+			curSubs = output[len(output)-1]
+
+			// validate tabu neighborhood
+			if ValidateTabu(curSubs, tabu) == false {
+				break
+			}
+
+			// compute current distance
+			curDist = basisSolution.Matrix.At(curSubs[0], curSubs[1])
+
+			// generate new try
+			try = NewSubs(curSubs, destinationSubs, curDist, searchParameters, searchDomain)
+
+			// apply control conditions
+			if try[0] == destinationSubs[0] && try[1] == destinationSubs[1] {
+				output = append(output, try)
+				break
+			} else if tabu.At(try[0], try[1]) == 0.0 {
+				continue
+			} else {
+				output = append(output, try)
+				tabu.Set(try[0], try[1], 0.0)
+			}
+		}
+
+		// repeat walk if destination not reached
+		if output[len(output)-1][0] == destinationSubs[0] && 
+		    output[len(output)-1][1] == destinationSubs[1] {
+
+			// break unbounded for loop
+			break
+		} else {
+
+			// re-initialize chromosomal 2D slice with source subscript as first element
+			output := make([][]int, 1, basisSolution.MaxLen)
+			output[0] = make([]int, 2)
+			output[0][0] = sourceSubs[0]
+			output[0][1] = sourceSubs[1]
+
+			// restart process
+			continue
+		}
+	}
+
+	// return final output
+	return output
+}
+
+// mutationwalk generates a new directed walk connecting a source subscript to a
+// destination subscript within the context of an input mutation search domain
+func MutationWalk(sourceSubs, destinationSubs []int, 
+    searchDomain *Domain, 
+    searchParameters *Parameters, 
+    basisSolution *Basis) (subs [][]int, tabuTest bool) {
+
+	// initialize chromosomal 2D slice with source subscript as first
+	// element
+	output := make([][]int, 1, basisSolution.MaxLen)
+	output[0] = make([]int, 2)
+	output[0][0] = sourceSubs[0]
+	output[0][1] = sourceSubs[1]
+
+	// initialize new tabu matrix
+	tabu := mat64.NewDense(searchDomain.Rows, searchDomain.Cols, nil)
+	tabu.Clone(searchDomain.Matrix)
+	tabu.Set(sourceSubs[0], sourceSubs[1], 0.0)
+
+	// initialize current subscripts, distance, try, and iteration counter
+	curSubs := make([]int, 2)
+	var curDist float64
+	var try []int
+	var test bool
+
+	// enter un-bounded for loop
+	for {
+
+		// get current subscripts
+		curSubs = output[len(output)-1]
+
+		// compute current distance
+		curDist = basisSolution.Matrix.At(curSubs[0], curSubs[1])
+
+		// generate new try
+		try = NewSubs(curSubs, searchParameters.DstSubs, curDist, searchParameters, searchDomain)
+
+		// apply control conditions
+		if try[0] == destinationSubs[0] && try[1] == destinationSubs[1] {
+			output = append(output, try)
+			break
+		} else if tabu.At(try[0], try[1]) == 0.0 {
+			continue
+		} else {
+			output = append(output, try)
+			tabu.Set(try[0], try[1], 0.0)
+		}
+
+		// validate tabu matrix
+		test = ValidateSubDomain(try, destinationSubs, tabu)
+
+		// reset if tabu is invalid
+		if test == false {
+			break
+		}
+	}
+
+	// return final output
+	return output, test
+}
+
+// newnodesubs generates an poutput slice of new intermediate destination nodes
+// that are progressively further, in terms of euclidean distance, from
+// a given input source location and are orientation towards a given
+// destination location
+func NewNodeSubs(searchDomain *Domain, searchParameters *Parameters) (nodeSubs [][]int) {
+
+	// initialize output
+	output := make([][]int, 1)
+	output[0] = searchParameters.SrcSubs
+
+	// check band count against input distance matrix size
+	if searchDomain.BndCnt < 3 {
+
+		// asign node subscripts
+		output = append(output, searchParameters.DstSubs)
+	} else if searchDomain.BndCnt >= 3 {
+
+		// generate distance matrix from source subscripts
+		distMat := AllDistance(searchParameters.SrcSubs, searchDomain.Matrix)
+
+		// encode distance bands
+		bandMat := DistanceBands(searchDomain.BndCnt, distMat)
+
+		if bandMat.At(searchParameters.SrcSubs[0], searchParameters.SrcSubs[1]) == 
+		    bandMat.At(searchParameters.DstSubs[0], searchParameters.DstSubs[1]) {
+
+			// asign node subscripts
+			output = append(output, searchParameters.DstSubs)
+		} else {
+
+			// seed random number generator
+			rand.Seed(time.Now().UnixNano())
+
+			// loop through band vector and generate band value subscripts
+			for i := 1; i < searchDomain.BndCnt-1; i++ {
+
+				// generate band mask
+				bandMaskMat := BandMask(float64(i), bandMat)
+
+				// break loop if the destination is in the current band mask
+				if bandMaskMat.At(searchParameters.DstSubs[0], searchParameters.DstSubs[1]) == 1.0 {
+					break
+				}
+
+				// generate orientation mask
+				orientMaskMat := 
+				    OrientationMask(output[i-1], searchParameters.DstSubs, searchDomain.Matrix)
+
+				// initialize final mask
+				finalMaskMat := mat64.NewDense(searchDomain.Rows, searchDomain.Cols, nil)
+
+				// compute final mask through elementwise multiplication
+				finalMaskMat.MulElem(bandMaskMat, orientMaskMat)
+
+				// generate subs from final mask
+				finalSubs := NonZeroSubs(finalMaskMat)
+
+				// generate random number of length interval
+				randInd := finalSubs[rand.Intn(len(finalSubs))]
+
+				// break out of loop if final mask is empty
+				if randInd[0] == 0 && randInd[1] == 0 {
+					break
+				}
+
+				// extract randomly selected value and write to output
+				output = append(output, randInd)
+			}
+
+			// set the final subscript to the destination
+			output = append(output, searchParameters.DstSubs)
+		}
+	}
+
+	// return output
+	return output
+}
+
+// multipartdirectedwalk generates a new multipart directed walk from a given set
+// of input problem parameters
+func MultiPartDirectedWalk(nodeSubs [][]int, 
+    searchDomain *Domain, 
+    searchParameters *Parameters) (subs [][]int) {
+
+	// generate basis solution
+	basisSolution := NewBasis(nodeSubs[0], nodeSubs[1], searchDomain)
+
+	// initialize output
+	output := make([][]int, basisSolution.MaxLen)
+
+	// catch single part walk case
+	if len(nodeSubs) == 2 {
+
+		// generate output as a single part directed walk
+		output = 
+		    DirectedWalk(nodeSubs[0], nodeSubs[1], searchDomain, searchParameters, basisSolution)
+
+	} else if len(nodeSubs) > 2 {
+
+		// generate output as multi part directed walk
+		output = 
+		    DirectedWalk(nodeSubs[0], nodeSubs[1], searchDomain, searchParameters, basisSolution)
+
+		// loop through the band count to generate sub walk parts
+		for i := 1; i < len(nodeSubs)-1; i++ {
+
+			// generate basis solution
+			basisSolution = NewBasis(nodeSubs[i], nodeSubs[i+1], searchDomain)
+
+			// generate initial output slice and then append subsequent slices
+			curWalk := 
+			    DirectedWalk(nodeSubs[i], nodeSubs[i+1], searchDomain, searchParameters, basisSolution)
+
+			/*
+				The debug section below is attempting to deal with possible cases
+				where two parts of two different path sections overlap in the final
+				multipart pathway. Attempts to deal with this by iteratively precluding
+				path sections from the search domain have lead to infinite loop conditions.
+				More work is needed to resolve this issue.
+			*/
+
+			// DEBUG
+			//// mask walk section from search domain
+			//for j := 0; j < len(curWalk); j++ {
+			//	searchDomain.Matrix.Set(curWalk[j][0], curWalk[j][1], 0.0)
+			//}
+
+			// append subscripts to output
+			for j := 1; j < len(curWalk); j++ {
+				output = append(output, curWalk[j])
+			}
+		}
+	}
+
+	// return output
+	return output
+}
+
+\end{lstlisting}
+
+\newpage
+
+<random\_test.go>
+
+\begin{lstlisting}[basicstyle=\tiny]
+
+// Copyright ©2015 The corridor Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
+package corridor
+
+import (
+	"math"
+	"testing"
+
+	"github.com/gonum/matrix/mat64"
+)
+
+// test multivariaterandomnormal
+func TestMultiVariateRandomNormal(t *testing.T) {
+
+	// initialize test case
+	t.Log("MultiVariateRandomNormal Test: Expected Value = [(1 +- 0.1) (1 +- 0.1)]")
+
+	// initialize expected values
+	var muVec = []float64{1, 1}
+	mu := mat64.NewDense(2, 1, muVec)
+	var sigmaVec = []float64{1, 0, 0, 1}
+	sigma := mat64.NewSymDense(2, sigmaVec)
+
+	// initialize test case variables
+	testMat := mat64.NewDense(10000, 2, nil)
+	testCase := make([]float64, 2)
+	var testBool bool
+	var aSum float64 = 0.0
+	var bSum float64 = 0.0
+
+	// perform test case
+	for i := 0; i < 10000; i++ {
+		curVal := MultiVariateNormalRandom(mu, sigma)
+		testMat.Set(i, 0, curVal.At(0, 0))
+		testMat.Set(i, 1, curVal.At(1, 0))
+	}
+
+	// compute test result
+	for i := 0; i < 10000; i++ {
+		aSum += testMat.At(i, 0)
+		bSum += testMat.At(i, 1)
+	}
+	testCase[0] = aSum / 10000.0
+	testCase[1] = bSum / 10000.0
+	testBool = (math.Abs(1-testCase[0]) < 0.1) && (math.Abs(1-testCase[1]) < 0.1)
+
+	// log test results
+	if testBool {
+		t.Log("MultiVariateRandomNormal Test: Computed Mean =", testCase)
+	} else {
+		t.Error("MultiVariateRandomNormal Test: Computed Mean =", testCase)
+	}
+}
+
+// test fixmultivariatenormalrandom
+func TestFixMultiVariateNormalRandom(t *testing.T) {
+
+	// initialize test case
+	t.Log("FixMultiVariateNormalRandom Test: Expected Value = [(0.47 +- 0.1) (0.47 +- 0.1)]")
+
+	// initialize expected values
+	var muVec = []float64{1, 1}
+	mu := mat64.NewDense(2, 1, muVec)
+	var sigmaVec = []float64{1, 0, 0, 1}
+	sigma := mat64.NewSymDense(2, sigmaVec)
+
+	// initialize test case variables
+	testMat := mat64.NewDense(10000, 2, nil)
+	testCase := make([]float64, 2)
+	var testBool bool
+	var aSum float64 = 0.0
+	var bSum float64 = 0.0
+
+	// generate fixed random samples
+	for i := 0; i < 10000; i++ {
+		curRnd := MultiVariateNormalRandom(mu, sigma)
+		curFix := FixMultiVariateNormalRandom(curRnd)
+		testMat.Set(i, 0, curFix.At(0, 0))
+		testMat.Set(i, 1, curFix.At(0, 1))
+	}
+
+	// compute test result
+	for i := 0; i < 10000; i++ {
+		aSum += testMat.At(i, 0)
+		bSum += testMat.At(i, 1)
+	}
+	testCase[0] = aSum / 10000.0
+	testCase[1] = bSum / 10000.0
+	testBool = (math.Abs(0.47-testCase[0]) < 0.1) && (math.Abs(0.47-testCase[1]) < 0.1)
+
+	// log test results
+	if testBool {
+		t.Log("FixMultiVariateNormalRandom Test: Computed Mean =", testCase)
+	} else {
+		t.Error("FixMultiVariateNormalRandom Test: Computed Value =", testCase)
+	}
+}
+
+// test newrandom
+func TestNewRandom(t *testing.T) {
+
+	// initialize test case
+	t.Log("NewRandom Test: Expected Value = [(0.615 +- 0.1) (0.615 +- 0.1)]")
+
+	// initialize expected values
+	var muVec = []float64{1, 1}
+	mu := mat64.NewDense(2, 1, muVec)
+	var sigmaVec = []float64{1, 0, 0, 1}
+	sigma := mat64.NewSymDense(2, sigmaVec)
+
+	// initialize test case variables
+	testMat := mat64.NewDense(10000, 2, nil)
+	testCase := make([]float64, 2)
+	var testBool bool
+	var aSum float64 = 0.0
+	var bSum float64 = 0.0
+
+	// generate random samples
+	for i := 0; i < 10000; i++ {
+		curVal := NewRandom(mu, sigma)
+		testMat.Set(i, 0, float64(curVal[0]))
+		testMat.Set(i, 1, float64(curVal[1]))
+	}
+
+	// compute test result
+	for i := 0; i < 10000; i++ {
+		aSum += testMat.At(i, 0)
+		bSum += testMat.At(i, 1)
+	}
+	testCase[0] = aSum / 10000.0
+	testCase[1] = bSum / 10000.0
+	testBool = (math.Abs(0.615-testCase[0]) < 0.1) && (math.Abs(0.615-testCase[1]) < 0.1)
+
+	// log test results
+	if testBool {
+		t.Log("NewRandom Test: Computed Value =", testCase)
+	} else {
+		t.Error("NewRandom Test: Computed Value =", testCase)
+	}
+}
+
+// test newmu
+func TestNewMu(t *testing.T) {
+
+	// initialize test case
+	t.Log("NewMu Test: Expected Value = {{2 1 1 [1 1]} 2 1}")
+
+	// initialize expected values
+	var expVal = []float64{1.0, 1.0}
+
+	// initialize test case variables
+	var curSubs = []int{10, 10}
+	var dstSubs = []int{100, 100}
+
+	// perform test case
+	testCase := NewMu(curSubs, dstSubs)
+
+	// log test results
+	if testCase.At(0, 0) == expVal[0] && testCase.At(1, 0) == expVal[1] {
+		t.Log("NewMu Test: Computed Value =", *testCase)
+	} else {
+		t.Error("NewMu Test: Computed Value =", *testCase)
+	}
+}
+
+// test newsigma
+func TestNewSigma(t *testing.T) {
+
+	// initialize test case
+	t.Log("NewSigma Test: Expected Matrix = {{2 1 [10 0 0 10]} 121}")
+
+	// initialize expected values
+	var expValVec = []float64{10.0, 0.0, 0.0, 10.0}
+	expValMat := mat64.NewDense(2, 2, expValVec)
+
+	// initialize test case variables
+	var iterations int = 1
+	var randomness float64 = 1.0
+	var distance float64 = 10.0
+
+	// perform test case
+	testCase := NewSigma(iterations, randomness, distance)
+
+	// log test results
+	if testCase.At(0, 0) == expValMat.At(0, 0) &&
+		testCase.At(0, 1) == expValMat.At(0, 1) &&
+		testCase.At(1, 0) == expValMat.At(1, 0) &&
+		testCase.At(1, 1) == expValMat.At(1, 1) {
+		t.Log("NewSigma Test: Computed Matrix =", *testCase)
+	} else {
+		t.Error("NewSigma Test: Compute Matrix =", *testCase)
+	}
+}
+
+// test newsubs
+func TestNewSubs(t *testing.T) {
+
+	// initialize test case
+	t.Log("NewSubs Test: Expected Value = [1 2] or [2 1]")
+
+	// initialize expected values
+	var expVal1 = []int{1, 2}
+	var expVal2 = []int{2, 1}
+
+	// initialize test case variables
+	var curSubs = []int{1, 1}
+	var dstSubs = []int{3, 3}
+	var curDist float64 = 0.0
+	testParams := NewParameters(curSubs, dstSubs, 10, 10, 1.0)
+	var domainVec = []float64{
+		0.0, 0.0, 0.0, 0.0, 0.0,
+		0.0, 1.0, 1.0, 1.0, 0.0,
+		0.0, 1.0, 0.0, 1.0, 0.0,
+		0.0, 1.0, 1.0, 1.0, 0.0,
+		0.0, 0.0, 0.0, 0.0, 0.0}
+	domainMat := mat64.NewDense(5, 5, domainVec)
+	testDomain := NewDomain(domainMat)
+
+	// perform test case
+	testCase := NewSubs(curSubs, dstSubs, curDist, testParams, testDomain)
+
+	// log test results
+	if (testCase[0] == expVal1[0] && testCase[1] == expVal1[1]) ||
+		(testCase[0] == expVal2[0] && testCase[1] == expVal2[1]) {
+		t.Log("NewSubs Test: Computed Value =", testCase)
+	} else {
+		t.Error("NewSubs Test: Computed Value =", testCase)
+	}
+}
+
+// test directedwalk
+func TestDirectedWalk(t *testing.T) {
+
+	// initialize test case
+	t.Log("DirectedWalk Test: Expected Value = [[1 1] [1 2] [2 3] [3 3]]")
+
+	// initialize expected values
+	expVal := make([][]int, 5)
+	expVal[0] = []int{1, 1}
+	expVal[1] = []int{1, 2}
+	expVal[2] = []int{2, 3}
+	expVal[3] = []int{3, 3}
+
+	// initialize test case variables
+	var sourceSubs = []int{1, 1}
+	var destinationSubs = []int{3, 3}
+	testParams := NewParameters(sourceSubs, destinationSubs, 10, 10, 1.0)
+	var domainVec = []float64{
+		0.0, 0.0, 0.0, 0.0, 0.0,
+		0.0, 1.0, 1.0, 0.0, 0.0,
+		0.0, 0.0, 0.0, 1.0, 0.0,
+		0.0, 0.0, 0.0, 1.0, 0.0,
+		0.0, 0.0, 0.0, 0.0, 0.0}
+	domainMat := mat64.NewDense(5, 5, domainVec)
+	testDomain := NewDomain(domainMat)
+	testBasis := NewBasis(sourceSubs, destinationSubs, testDomain)
+	var testBool bool
+
+	// perform test case
+	testCase := DirectedWalk(sourceSubs, destinationSubs, testDomain, testParams, testBasis)
+
+	// evaluate test results
+	for i := 0; i < 4; i++ {
+		if testCase[i][0] == expVal[i][0] && testCase[i][1] == expVal[i][1] {
+			testBool = true
+		} else {
+			testBool = false
+			break
+		}
+	}
+
+	// log test results
+	if testBool {
+		t.Log("DirectedWalk Test: Computed Value =", testCase)
+	} else {
+		t.Error("DirectedWalk Test: Computed Value =", testCase)
+	}
+}
+
+// test mutationwalk
+func TestMutationWalk(t *testing.T) {
+
+	// initialize test case
+	t.Log("MutationWalk Test: Expected Value = [[1 1] [2 1] [3 2] [3 3]] or [[1 1] [1 2] [2 3] [3 3]]")
+
+	// initialize test case variables
+	var sourceSubs = []int{1, 1}
+	var destinationSubs = []int{3, 3}
+	testParams := NewParameters(sourceSubs, destinationSubs, 10, 10, 1.0)
+	var domainVec = []float64{
+		0.0, 0.0, 0.0, 0.0, 0.0,
+		0.0, 1.0, 1.0, 1.1, 0.0,
+		0.0, 1.0, 0.0, 1.0, 0.0,
+		0.0, 1.0, 1.0, 1.0, 0.0,
+		0.0, 0.0, 0.0, 0.0, 0.0}
+	domainMat := mat64.NewDense(5, 5, domainVec)
+	testDomain := NewDomain(domainMat)
+	testBasis := NewBasis(sourceSubs, destinationSubs, testDomain)
+	var testBool bool
+	var testCase [][]int
+
+	// perform test case
+	for {
+		testCase, testBool = MutationWalk(sourceSubs, 
+		    destinationSubs, testDomain, testParams, testBasis)
+		if testBool == true {
+			break
+		} else {
+			continue
+		}
+	}
+
+	// log test results
+	if testBool {
+		t.Log("MutationWalk Test: Computed Value =", testCase)
+	} else {
+		t.Error("MutationWalk Test: Computed Value =", testCase)
+	}
+}
+
+// test newnodesubs
+func TestNewNodeSubs(t *testing.T) {
+
+	// initialize test case
+	t.Log("NewNodeSubs Test: Expected Value = [[1 1] [2 2] [3 3]]")
+
+	// initialize expected values
+	expVal := make([][]int, 3)
+	expVal[0] = []int{1, 1}
+	expVal[1] = []int{2, 2}
+	expVal[2] = []int{3, 3}
+
+	// initialize test case variables
+	var sourceSubs = []int{1, 1}
+	var destinationSubs = []int{3, 3}
+	testParams := NewParameters(sourceSubs, destinationSubs, 10, 10, 1.0)
+	var domainVec = []float64{
+		0.0, 0.0, 0.0, 0.0, 0.0,
+		0.0, 1.0, 1.0, 1.1, 0.0,
+		0.0, 1.0, 1.0, 1.0, 0.0,
+		0.0, 1.0, 1.0, 1.0, 0.0,
+		0.0, 0.0, 0.0, 0.0, 0.0}
+	domainMat := mat64.NewDense(5, 5, domainVec)
+	testDomain := NewDomain(domainMat)
+	testDomain.BndCnt = 3
+
+	// perform test case
+	testCase := NewNodeSubs(testDomain, testParams)
+	testBool := (testCase[0][0] == expVal[0][0] &&
+		testCase[0][1] == expVal[0][1] &&
+		testCase[1][0] == expVal[1][0] &&
+		testCase[1][1] == expVal[1][1] &&
+		testCase[2][0] == expVal[2][0] &&
+		testCase[2][1] == expVal[2][1])
+
+	// log test results
+	if testBool {
+		t.Log("NewNodeSubs Test: Computed Value =", testCase)
+	} else {
+		t.Error("NewNodeSubs Test: Computed Value =", testCase)
+	}
+}
+
+// test multipartdirectedwalk
+func TestMultiPartDirectedWalk(t *testing.T) {
+
+	// initialize test case
+	t.Log("MultiPartDirectedWalk: Expected Value = [[1 1]...[3 3]]")
+
+	// initialize expected value
+
+	// initialize test case variables
+	var sourceSubs = []int{1, 1}
+	var destinationSubs = []int{3, 3}
+	testParams := NewParameters(sourceSubs, destinationSubs, 10, 10, 1.0)
+	var domainVec = []float64{
+		0.0, 0.0, 0.0, 0.0, 0.0,
+		0.0, 1.0, 0.0, 0.1, 0.0,
+		0.0, 1.0, 1.0, 0.0, 0.0,
+		0.0, 1.0, 1.0, 1.0, 0.0,
+		0.0, 0.0, 0.0, 0.0, 0.0}
+	domainMat := mat64.NewDense(5, 5, domainVec)
+	testDomain := NewDomain(domainMat)
+	testDomain.BndCnt = 3
+	nodeSubs := make([][]int, 3)
+	nodeSubs[0] = []int{1, 1}
+	nodeSubs[1] = []int{3, 1}
+	nodeSubs[2] = []int{3, 3}
+
+	// perform test case
+	testCase := MultiPartDirectedWalk(nodeSubs, testDomain, testParams)
+
+	// evaluate test case
+	t.Log("MultiPartDirectedWalk: Computed Value =", testCase)
+}
+
+\end{lstlisting}
+
+\newpage
+
+<samples.go>
+
+\begin{lstlisting}[basicstyle=\tiny]
+
+// Copyright ©2015 The corridor Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
+package corridor
+
+import (
+	"math"
+	"math/rand"
+	"runtime"
+	"time"
+
+	"github.com/gonum/matrix/mat64"
+)
+
+// new sample parameters initialization function
+func NewSampleParameters(searchDomain *Domain) *Parameters {
+
+	// initialize variables
+	sourceSubscripts := make([]int, 2)
+	sourceSubscripts[0] = 3
+	sourceSubscripts[1] = 3
+	destinationSubscripts := make([]int, 2)
+	destinationSubscripts[0] = searchDomain.Rows - 3
+	destinationSubscripts[1] = searchDomain.Cols - 3
+	randomnessCoefficient := 1.0
+	populationSize := 1000
+	selectionFraction := 0.5
+	selectionProbability := 0.8
+	mutationCount := 1
+	mutationFraction := 0.2
+	evolutionSize := 1000
+	maxConcurrency := runtime.NumCPU()
+
+	// return output
+	return &Parameters{
+		SrcSubs: sourceSubscripts,
+		DstSubs: destinationSubscripts,
+		RndCoef: randomnessCoefficient,
+		PopSize: populationSize,
+		SelFrac: selectionFraction,
+		SelProb: selectionProbability,
+		MutaCnt: mutationCount,
+		MutaFrc: mutationFraction,
+		EvoSize: evolutionSize,
+		ConSize: maxConcurrency,
+	}
+}
+
+// new sample domain initialization function
+func NewSampleDomain(rows, cols int) *Domain {
+
+	// initialize empty matrix
+	domainSize := rows * cols
+	mat := make([]float64, domainSize)
+	domainMatrix := mat64.NewDense(rows, cols, mat)
+
+	// loop through index values togo define domain
+	for i := 0; i < rows; i++ {
+		for j := 0; j < cols; j++ {
+			if i == 0 {
+				domainMatrix.Set(i, j, 0.0)
+			} else if i == rows-1 {
+				domainMatrix.Set(i, j, 0.0)
+			} else if j == 0 {
+				domainMatrix.Set(i, j, 0.0)
+			} else if j == cols-1 {
+				domainMatrix.Set(i, j, 0.0)
+			} else {
+				domainMatrix.Set(i, j, 1.0)
+			}
+		}
+	}
+
+	// compute band count
+	bandCount := 2 + 
+	    (int(math.Floor(math.Sqrt(math.Pow(float64(rows), 2.0)+math.Pow(float64(cols), 2.0)))) / 142)
+
+	// return output
+	return &Domain{
+		Rows:   rows,
+		Cols:   cols,
+		Matrix: domainMatrix,
+		BndCnt: bandCount,
+	}
+}
+
+// new sample mutation domain initialization function
+func NewSampleMutationDomain() *Domain {
+
+	// fix domain size
+	var rows int = 5
+	var cols int = 5
+
+	// initialize empty matrix
+	domainSize := rows * cols
+	mat := make([]float64, domainSize)
+	domainMatrix := mat64.NewDense(rows, cols, mat)
+
+	// loop through index values togo define domain
+	for i := 0; i < rows; i++ {
+		for j := 0; j < cols; j++ {
+			if i == 0 {
+				domainMatrix.Set(i, j, 0.0)
+			} else if i == rows-1 {
+				domainMatrix.Set(i, j, 0.0)
+			} else if j == 0 {
+				domainMatrix.Set(i, j, 0.0)
+			} else if j == cols-1 {
+				domainMatrix.Set(i, j, 0.0)
+			} else {
+				domainMatrix.Set(i, j, 1.0)
+			}
+		}
+	}
+
+	// eliminate center
+	domainMatrix.Set(2, 2, 0.0)
+
+	// set band count to nil
+	var bandCount int = 2
+
+	// return output
+	return &Domain{
+		Rows:   rows,
+		Cols:   cols,
+		Matrix: domainMatrix,
+		BndCnt: bandCount,
+	}
+}
+
+// new sample objective initialization function
+func NewSampleObjectives(rows, cols, objectiveCount int) *MultiObjective {
+
+	// initialize matrix dimensions
+	objectiveSize := rows * cols
+	var objectiveId int = 0
+
+	// seed random number generator
+	rand.Seed(time.Now().UnixNano())
+
+	// initialize empty objective slice
+	objSlice := make([]*Objective, objectiveCount)
+
+	// loop through matrix indices and assign random objective values
+	for k := 0; k < objectiveCount; k++ {
+
+		// initialize empty objective matrix
+		mat := make([]float64, objectiveSize)
+		objMat := mat64.NewDense(rows, cols, mat)
+
+		// write random objective values
+		for i := 0; i < rows; i++ {
+			for j := 0; j < cols; j++ {
+				objMat.Set(i, j, math.Abs(rand.Float64()))
+			}
+		}
+
+		// write to objective slice
+		objSlice[k] = NewObjective(objectiveId, objMat)
+
+		// iterate objective id
+		objectiveId += 1
+	}
+
+	return &MultiObjective{
+		ObjectiveCount: objectiveCount,
+		Objectives:     objSlice,
+	}
+}
+
+\end{lstlisting}
+
+\newpage
+
+<samples\_test.go>
+
+\begin{lstlisting}[basicstyle=\tiny]
+
+// Copyright ©2015 The corridor Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
+package corridor
+
+import (
+	"fmt"
+	"runtime"
+	"testing"
+)
+
+// small problem benchmark
+func BenchmarkSmall(b *testing.B) {
+
+	// set max processing units
+	runtime.GOMAXPROCS(1)
+
+	// initialize domain
+	sampleDomain := NewSampleDomain(20, 20)
+	sampleDomain.BndCnt = 3
+
+	// initialize objectives
+	objectiveCount := 3
+	sampleObjectives := NewSampleObjectives(sampleDomain.Rows, sampleDomain.Cols, objectiveCount)
+
+	// initialize parameters
+	sampleParameters := NewSampleParameters(sampleDomain)
+
+	// evolve populations
+	toyEvolution := NewEvolution(sampleParameters, sampleDomain, sampleObjectives)
+
+	// extract output population
+	finalPop := <-toyEvolution.Populations
+
+	// view output population
+	ViewPopulation(sampleDomain, sampleParameters, finalPop)
+
+	// print top individual fitness
+	fmt.Println("Population Mean Fitness =")
+	fmt.Println(finalPop.MeanFitness)
+}
+
+// parallel small problem benchmark
+func BenchmarkParallelSmall(b *testing.B) {
+
+	// set max processing units
+	cpuCount := runtime.NumCPU()
+	runtime.GOMAXPROCS(cpuCount)
+
+	// initialize domain
+	sampleDomain := NewSampleDomain(20, 20)
+	sampleDomain.BndCnt = 3
+
+	// initialize objectives
+	objectiveCount := 3
+	sampleObjectives := NewSampleObjectives(sampleDomain.Rows, sampleDomain.Cols, objectiveCount)
+
+	// initialize parameters
+	sampleParameters := NewSampleParameters(sampleDomain)
+
+	// evolve populations
+	toyEvolution := NewEvolution(sampleParameters, sampleDomain, sampleObjectives)
+
+	// extract output population
+	finalPop := <-toyEvolution.Populations
+
+	// view output population
+	ViewPopulation(sampleDomain, sampleParameters, finalPop)
+
+	// print top individual fitness
+	fmt.Println("Population Mean Fitness =")
+	fmt.Println(finalPop.MeanFitness)
+}
+
+// medium problem benchmark
+func BenchmarkMedium(b *testing.B) {
+
+	// set max processing units
+	runtime.GOMAXPROCS(1)
+
+	// initialize domain
+	sampleDomain := NewSampleDomain(20, 20)
+	sampleDomain.BndCnt = 3
+
+	// initialize objectives
+	objectiveCount := 3
+	sampleObjectives := NewSampleObjectives(sampleDomain.Rows, sampleDomain.Cols, objectiveCount)
+
+	// initialize parameters
+	sampleParameters := NewSampleParameters(sampleDomain)
+	sampleParameters.PopSize = 10000
+
+	// evolve populations
+	toyEvolution := NewEvolution(sampleParameters, sampleDomain, sampleObjectives)
+
+	// extract output population
+	finalPop := <-toyEvolution.Populations
+
+	// view output population
+	ViewPopulation(sampleDomain, sampleParameters, finalPop)
+
+	// print top individual fitness
+	fmt.Println("Population Mean Fitness =")
+	fmt.Println(finalPop.MeanFitness)
+}
+
+// parallel medium problem benchmark
+func BenchmarkParallelMedium(b *testing.B) {
+
+	// set max processing units
+	cpuCount := runtime.NumCPU()
+	runtime.GOMAXPROCS(cpuCount)
+
+	// initialize domain
+	sampleDomain := NewSampleDomain(20, 20)
+	sampleDomain.BndCnt = 3
+
+	// initialize objectives
+	objectiveCount := 3
+	sampleObjectives := NewSampleObjectives(sampleDomain.Rows, sampleDomain.Cols, objectiveCount)
+
+	// initialize parameters
+	sampleParameters := NewSampleParameters(sampleDomain)
+	sampleParameters.PopSize = 10000
+
+	// evolve populations
+	toyEvolution := NewEvolution(sampleParameters, sampleDomain, sampleObjectives)
+
+	// extract output population
+	finalPop := <-toyEvolution.Populations
+
+	// view output population
+	ViewPopulation(sampleDomain, sampleParameters, finalPop)
+
+	// print top individual fitness
+	fmt.Println("Population Mean Fitness =")
+	fmt.Println(finalPop.MeanFitness)
+}
+
+// large problem benchmark
+func BenchmarkLarge(b *testing.B) {
+
+	// set max processing units
+	runtime.GOMAXPROCS(1)
+
+	// initialize domain
+	sampleDomain := NewSampleDomain(20, 20)
+	sampleDomain.BndCnt = 3
+
+	// initialize objectives
+	objectiveCount := 3
+	sampleObjectives := NewSampleObjectives(sampleDomain.Rows, sampleDomain.Cols, objectiveCount)
+
+	// initialize parameters
+	sampleParameters := NewSampleParameters(sampleDomain)
+	sampleParameters.PopSize = 100000
+
+	// evolve populations
+	toyEvolution := NewEvolution(sampleParameters, sampleDomain, sampleObjectives)
+
+	// extract output population
+	finalPop := <-toyEvolution.Populations
+
+	// view output population
+	ViewPopulation(sampleDomain, sampleParameters, finalPop)
+
+	// print top individual fitness
+	fmt.Println("Population Mean Fitness =")
+	fmt.Println(finalPop.MeanFitness)
+}
+
+// parallel large problem benchmark
+func BenchmarkParallelLarge(b *testing.B) {
+
+	// set max processing units
+	cpuCount := runtime.NumCPU()
+	runtime.GOMAXPROCS(cpuCount)
+
+	// initialize domain
+	sampleDomain := NewSampleDomain(20, 20)
+	sampleDomain.BndCnt = 3
+
+	// initialize objectives
+	objectiveCount := 3
+	sampleObjectives := NewSampleObjectives(sampleDomain.Rows, sampleDomain.Cols, objectiveCount)
+
+	// initialize parameters
+	sampleParameters := NewSampleParameters(sampleDomain)
+	sampleParameters.PopSize = 100000
+
+	// evolve populations
+	toyEvolution := NewEvolution(sampleParameters, sampleDomain, sampleObjectives)
+
+	// extract output population
+	finalPop := <-toyEvolution.Populations
+
+	// view output population
+	ViewPopulation(sampleDomain, sampleParameters, finalPop)
+
+	// print top individual fitness
+	fmt.Println("Population Mean Fitness =")
+	fmt.Println(finalPop.MeanFitness)
+}
+
+\end{lstlisting}
+
+\newpage
+
+<types.go>
+
+\begin{lstlisting}[basicstyle=\tiny]
+
+// Copyright ©2015 The corridor Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
+package corridor
+
+import (
+	"github.com/gonum/matrix/mat64"
+	"github.com/satori/go.uuid"
+)
+
+// parameters are comprised of fixed input avlues that are
+// unique to the problem specification that are referenced
+// by the algorithm at various stage of the solution process
+type Parameters struct {
+	SrcSubs []int
+	DstSubs []int
+	RndCoef float64
+	PopSize int
+	SelFrac float64
+	SelProb float64
+	MutaCnt int
+	MutaFrc float64
+	EvoSize int
+	ConSize int
+}
+
+// domains are comprised of boolean arrays which indicate the
+// feasible locations for the search algorithm
+type Domain struct {
+	Rows   int
+	Cols   int
+	Matrix *mat64.Dense
+	BndCnt int
+}
+
+// objectives are comprised of matrices which use location
+// indices to key to floating point fitness values within the
+// search domain
+type Objective struct {
+	Id     int
+	Matrix *mat64.Dense
+}
+
+// multiObjective objects are comprised of a channel of individual
+// independent objectives that are used for the evaluation of
+// chromosome and population level fitness values
+type MultiObjective struct {
+	ObjectiveCount int
+	Objectives     []*Objective
+}
+
+// a basis solution is comprised of the subscript indices forming
+// the euclidean shortest path connecting the source to the dest
+type Basis struct {
+	Matrix *mat64.Dense
+	Subs   [][]int
+	MaxLen int
+}
+
+// chromosomess are comprised of genes which are distinct row column
+// indices to some spatially reference search domain.
+type Chromosome struct {
+	Id               uuid.UUID
+	Subs             [][]int
+	Fitness          [][]float64
+	TotalFitness     []float64
+	AggregateFitness float64
+}
+
+// populations are comprised of a fixed number of chromosomes.
+// this number corresponds to the populationSize.
+type Population struct {
+	Id                   int
+	Chromosomes          chan *Chromosome
+	MeanFitness          []float64
+	AggregateMeanFitness float64
+}
+
+// evolutions are comprised of a stochastic number of populations.
+// this number is determined by the convergence rate of the
+// algorithm.
+type Evolution struct {
+	Populations     chan *Population
+	FitnessGradient []float64
+}
+
+\end{lstlisting}
+
+\newpage
+
+<visualize.go>
+
+\begin{lstlisting}[basicstyle=\tiny]
+
+// Copyright ©2015 The corridor Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.package main
+
+package corridor
+
+import (
+	"fmt"
+
+	"github.com/gonum/matrix/mat64"
+)
+
+// function to print the properties of a search domain to the command line
+func ViewDomain(searchDomain *Domain) {
+
+	// get search domain matrix dimensions
+	rows, _ := searchDomain.Matrix.Dims()
+
+	// print domain values to command line
+	fmt.Printf("Search Domain Values = \n")
+	for i := 0; i < rows; i++ {
+		rawRowVals := searchDomain.Matrix.RawRowView(i)
+		fmt.Printf("%1.0f\n", rawRowVals)
+	}
+}
+
+// function to print the properties of a basis solution to the command line
+func ViewBasis(basisSolution *Basis) {
+
+	// get basis solution matrix dimensions
+	rows, _ := basisSolution.Matrix.Dims()
+
+	// print domain values to command line
+	fmt.Printf("Basis Solution Values = \n")
+	for i := 0; i < rows; i++ {
+		rawRowVals := basisSolution.Matrix.RawRowView(i)
+		fmt.Printf("%1.0f\n", rawRowVals)
+	}
+}
+
+// function to print the properties of a chromosome to the command line
+func ViewChromosome(searchDomain *Domain, searchParameters *Parameters, inputChromosome *Chromosome) {
+
+	// get search domain matrix dimensions and empty value slice
+	domainSize := searchDomain.Rows * searchDomain.Cols
+	v := make([]float64, domainSize)
+
+	// allocate new empty matrix
+	blankMat := mat64.NewDense(searchDomain.Rows, searchDomain.Cols, v)
+
+	// assign chromosome values to the empty matrix
+	for i := 0; i < len(inputChromosome.Subs); i++ {
+		blankMat.Set(inputChromosome.Subs[i][0], inputChromosome.Subs[i][1], 1.0)
+	}
+
+	// print chromosome values to command line
+	fmt.Printf("Chromosome = \n")
+	for i := 0; i < searchDomain.Rows; i++ {
+		rawRowVals := blankMat.RawRowView(i)
+		fmt.Printf("%1.0f\n", rawRowVals)
+	}
+
+	// print output to the command line
+	fmt.Printf("Chromosome Length = %d\n", len(inputChromosome.Subs))
+	fmt.Printf("Chromosome Total Fitness = %1.5f\n", inputChromosome.TotalFitness)
+}
+
+// functions to print the frequency of chromosomes in a search domain to the command line
+func ViewPopulation(searchDomain *Domain, searchParameters *Parameters, inputPopulation *Population) {
+
+	// allocate new empty matrix
+	mat := mat64.NewDense(searchDomain.Rows, searchDomain.Cols, nil)
+
+	// accumulated visited subscripts in new empty matrix
+	for i := 0; i < searchParameters.PopSize; i++ {
+
+		// extract current chromosome from channel
+		curChrom := <-inputPopulation.Chromosomes
+		curInd := curChrom.Subs
+		lenCurInd := len(curInd)
+
+		// iterate over subscript indices
+		for j := 0; j < lenCurInd; j++ {
+			curSubs := curInd[j]
+			curVal := mat.At(curSubs[0], curSubs[1])
+			newVal := curVal + 1
+			mat.Set(curSubs[0], curSubs[1], newVal)
+		}
+
+		// repopulate channel
+		inputPopulation.Chromosomes <- curChrom
+	}
+
+	// print matrix values to command line
+	fmt.Printf("Population Size = %d\n", searchParameters.PopSize)
+	fmt.Printf("Population Frequency = \n")
+	for q := 0; q < searchDomain.Rows; q++ {
+		rawRowVals := mat.RawRowView(q)
+		fmt.Printf("%*.0f\n", DigitCount(searchParameters.PopSize)+1, rawRowVals)
+	}
+}
+
+\end{lstlisting}
+
 

@@ -58,7 +58,9 @@
 \RequirePackage[width=5.75in, letterpaper]{geometry}
 \RequirePackage{fancyhdr}
 
+
 % DEBUG
+\RequirePackage{listings}
 \RequirePackage{algorithm}
 \RequirePackage{amsmath}
 \RequirePackage{dirtree}
