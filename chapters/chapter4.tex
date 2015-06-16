@@ -394,6 +394,14 @@ The corresponding elevation profile for the solution illustrated in Figure \ref{
     
 \section{San Diego Region}
 
+The third case study region investigated as part of this dissertation consists of the HUC-8 basin comprising the city of San Diego and its adjacent metropolitan districts. This basin is situated at the southwestern most tip of the State of California and adjoins the international border between the United States and Mexico as shown by the black filled area plotted in Figure \ref{fig:SDoverview}.
+
+In terms of its water resource management history, San Diego has become world renowned as a leader in freshwater management for its innovative approaches to demand management policy and advanced technological solutions for providing alternatives supply. As is often the case, necessity has been the mother of this innovation, with the San Diego region experiencing explosive growth in population growth and associated freshwater demand over the past 50 years while at the same time being cutoff from major statewide inter-basin water transfer projects.
+
+For example, from 2009 to 2013 the San Diego Municipal Water District embarked upon a large scale demonstration project to determine whether the advanced tertiary water treatment systems that would be necessary to facilitate large scale indirect, or possibly even direct, potable reuse could be implemented effectively and reliably at scale. In this project, purified water was blended with imported water supplies in the San Vicente Reservoir before going to the standard drinking water treatment plant. A portion of this water is also directed to a dedicated groundwater recharge facility at the Santee Basin that was used as the designated destination location in the corridor location analysis described below.
+
+Due in large part to this success of the pilot program, the San Diego city council recently unanimously approved a three and a half billion dollar direct potable reuse project and plant that is to be constructed over the next decade. This facility is being planned in conjunction with another large scale desalination plant in a bid to build a portfolio of alternative freshwater supply and groundwater recharge capacity just as the state enters the fourth year of a crippling drought condition. 
+
     \subsection{Regional Context}
     
     \begin{itemize}
@@ -418,6 +426,8 @@ The corresponding elevation profile for the solution illustrated in Figure \ref{
 
     \subsection{Search Domain}
     
+    The search domain comprising the San Diego study region is described in the statistics below and depicted graphically in the map panel contained within \ref{fig:SDdomain}.
+        
     \begin{itemize}
       \setlength{\itemsep}{0cm}
       \setlength{\parskip}{0cm}
@@ -436,6 +446,8 @@ The corresponding elevation profile for the solution illustrated in Figure \ref{
 
     \subsection{Proposed Corridor Endpoints}
     
+The proposed endpoints to be used in the MOGADOR algorithm specification are shown in Figure \ref{fig:SDendpoints}. The source location was determined by the location of the largest NPDES permitted WWTP in the basin while the destination location, in this case, was pre-determined as the location at which an artificial groundwater recharge basin has already been implemented.
+    
     \begin{itemize}
       \setlength{\itemsep}{0cm}
       \setlength{\parskip}{0cm}
@@ -453,6 +465,8 @@ The corresponding elevation profile for the solution illustrated in Figure \ref{
         \end{figure}
 
     \subsection{Proposed Objective Layers}
+    
+The three proposed objective layers which round out the MOGADOR algorithm problem specification and depicted in Figures \ref{fig:SDdisturbance} through \ref{fig:SDslope}, consist of the same accessibility, landuse disturbance, and slope based data layers as those described previously for Santa Barbara \& Oxnard, and used for all of the case studies included in this analysis. In terms of the structure of these objectives in the San Diego region, the coastal areas tend to be very highly developed with large land use disturbance scores as well as a dense road network providing favorable accessibility values. The basin does not contain an extreme amount of topographic relief as evidenced by the fairly homogeneous distribution of slopes shown in Figure \ref{fig:SDslope}.
 
         \begin{figure}[!h]
             \begin{center}
@@ -479,6 +493,10 @@ The corresponding elevation profile for the solution illustrated in Figure \ref{
         \end{figure}
         
     \subsection{Proposed Corridor Solutions}
+
+The results of the three runs of the MOGADOR algorithm for the San Diego region case study corridor location analysis are presented in Figure \ref{SDresults} and reflect the same three variations on the seed population size described for the previous case studies. Here again, the highest quality solution set was produced by the MOGADOR run using the largest population size with the minimum cumulative objective scores for the top 100 output solutions ranging from 3840 to 3865. Between the three algorithm runs, the majority of the aggregate objective score improvement came from reductions in the accessibility and disturbance scores; this, again, reflecting the algorithm's iterative discovery of those corridor sections running in and along road network sections while avoiding areas with higher intensity landuse.
+
+The top output solution for the three runs is depicted in the context of the entire search domain in Figure \ref{fig:SDsolutionOverview}. As this Figure shows the final corridor routes from the location of the coastal WWTP treatment plant, around the large harbor area at the Southwest portion of the search domain, and up towards the existing groundwater recharge facility located at the heart of the basin. 
     
         \begin{figure}[!h]
             \begin{center}
@@ -496,6 +514,8 @@ The corresponding elevation profile for the solution illustrated in Figure \ref{
             \end{center}
         \end{figure}
         
+Figure \ref{fig:SDelevationProfile} plots the elevation profile of the land surface along the length of the proposed corridor solution. The maximum elevation gain between the endpoints of the corridor is roughly 230 meters, however there is a considerable amount of ups and downs along the corridor's length. The jaggedness of the elevation profile reflects the extremely high density of the urban environment in the area immediately inland from the coastal WWTP. It reflects a necessary tradeoff between the accumulation of slope and the need to route around areas with high intensity existing landuse. 
+        
         \begin{figure}[!h]
             \begin{center}
             \includegraphics[width=5.5in]{figures/SanDiego_Elevation_Profile.png}   
@@ -503,8 +523,6 @@ The corresponding elevation profile for the solution illustrated in Figure \ref{
             \label{fig:SDelevationProfile}
             \end{center}
         \end{figure}
-    
-    \subsection{Anticipated Distribution of Life Cycle Energy Usages and Net Water Savings}
 
 \clearpage
 
