@@ -710,6 +710,12 @@ Figure \ref{fig:SASBelevationProfile} plots the along corridor elevation profile
 
 \section{Fresno -- Tulare Region}
 
+The fifth and final case study region is comprised of the HUC-8 basin containing the cities of Fresno and Tulare. This case study region is depicted graphically by the region filled in black in Figure \ref{fig:Foverview}. This basin differs from those included in the previous case studies in that it is internally drained -- i.e. landlocked. This unique hydrologic feature is due to the fact that it is situated within California's Central Valley. In terms of total area, Fresno is the largest of the five case study regions. However, its topography and landuse characteristics are significantly more homogeneous than those for the other case study regions. Fresno -- Tulare, and indeed the majority of the southern portion of the California Central Valley are heavily agricultural. This is a result of the area's high quality soils, evenly flat topography, and favorable climactic regime with a large number of annual growing days. 
+
+Due to the historic prominence of agricultural activity in this region, the local economy of the Fresno -- Tulare region is heavily skewed towards agricultural activity. As a result, there has evolved a sort of lock-in effect where the region is relied upon to produce crop outputs for national and international export regardless of the local precipitation patterns. For decades now, this situation has caused farmers to turn to local groundwater resources to offset deficiencies in freshwater supply in periods of drought. This has lead to unsustainable rates of subsurface aquifer withdrawals; on state of groundwater overdraft that in many places within the study site threaten the long term health and viability of the aquifers. 
+
+In an effort to fight harmful consequences of this overdraft condition such as groundwater contamination and land surface subsidence, regional freshwater managers have been exploring the use of treated wastewater to provide and artificial source of groundwater recharge. The need to better understand the energy-water usage efficiencies of these types of reuse systems in this area make it a prime candidate for assessment as part of this dissertation project.  
+
     \subsection{Regional Context}
 
     \begin{itemize}
@@ -733,6 +739,8 @@ Figure \ref{fig:SASBelevationProfile} plots the along corridor elevation profile
         \end{figure}
 
     \subsection{Search Domain}
+
+ The search domain comprising the Fresno -- Tulare case study region is described in the statistics below and depicted graphically in the map panel contained within \ref{fig:Fdomain}.
     
     \begin{itemize}
       \setlength{\itemsep}{0cm}
@@ -751,6 +759,8 @@ Figure \ref{fig:SASBelevationProfile} plots the along corridor elevation profile
         \end{figure}
         
     \subsection{Destination Search Inputs}
+    
+The destination search inputs for the siting of the groundwater recharge basin are illustrated in Figures \ref{fig:Fdsinputs_slope} through \ref{fig:Fdsinputs_landuse}. Here again, as with the four other case study regions, these are comprised of the same slope, surface geology, and landuse based nominally standardized spatial data layers.
     
         \begin{figure}[!h]
             \begin{center}
@@ -778,6 +788,8 @@ Figure \ref{fig:SASBelevationProfile} plots the along corridor elevation profile
     
     \subsection{Destination Search Outputs}
     
+In absolute terms, the majority of the area contained within the Fresno -- Tulare search domain is actually quite highly suitable for the implementation of a groundwater recharge basin. In terms of relative suitability however, the most favorable region was found to be located in the Northwestern portion of the search domain adjacent to an existing surface water feature and depicted graphically by the connected candidate regions plotted in Figure \ref{fig:Fdsoutputs_cand}. 
+    
         \begin{figure}[!h]
             \begin{center}
             \includegraphics[width=5.5in]{figures/Fresno_Search_Composite.png}   
@@ -795,6 +807,8 @@ Figure \ref{fig:SASBelevationProfile} plots the along corridor elevation profile
         \end{figure}
 
     \subsection{Proposed Corridor Endpoints}
+    
+The proposed corridor endpoints for the MOGADOR algorithm problem specification are plotted in Figure \ref{fig:Fendpoints}. The spacing between the source and destination cells within the search domain is the largest of that for any of the case studies included  in this entire analysis. This feature, combined with the sheer size of the Fresno -- Tulare regions search domain makes it a challenging candidate candidate for the corridor location optimization procedure. 
     
     \begin{itemize}
       \setlength{\itemsep}{0cm}
@@ -814,11 +828,13 @@ Figure \ref{fig:SASBelevationProfile} plots the along corridor elevation profile
 
     \subsection{Proposed Objective Layers}
     
+The proposed objective for the MOGADOR algorithm problem specification are plotted graphically in Figures \ref{fig:Faccessibility} through \ref{fig:Fslope}. More so than for any other case study region investigated as part of this analysis, these layers are homogeneous in structure. This presents an additional challenge to the operation of the corridor location optimization procedure. 
+    
         \begin{figure}[!h]
             \begin{center}
             \includegraphics[width=5.5in]{figures/Fresno_AccessibilityScore.png}   
             \caption{Fresno -- Tulare Region Accessibility Based Objective Scores (Blue:Low, Red:High)}
-            \label{fig:Faccessibilty}
+            \label{fig:Faccessibility}
             \end{center}
         \end{figure}
 
@@ -840,6 +856,8 @@ Figure \ref{fig:SASBelevationProfile} plots the along corridor elevation profile
         
     \subsection{Proposed Corridor Solutions}
     
+The characteristics of the proposed corridor location solutions generated as outputs from the MOGADOR algorithm for three different population sizes are depicted in Figure \ref{fig:Fresults}. As this figure shows, and as might be expected, the best final solution set by the algorithm very closely approximates the euclidean shortest path between the input source and the input destination provided in the problem specification. The seeming simplicity of this final solution belies the significant computation effort required to search such a large decision space. For, as it shall be discussed in greater detail in subsequent sections, the runtime of the MOGADOR algorithm for the Fresno -- Tulare case study region was far and away the longest among all of the case study sites. 
+    
         \begin{figure}[!h]
             \begin{center}
             \includegraphics[width=6in]{figures/Fresno_PathwayResults.png}   
@@ -855,6 +873,8 @@ Figure \ref{fig:SASBelevationProfile} plots the along corridor elevation profile
             \label{fig:FsolutionOverview}
             \end{center}
         \end{figure}
+
+Figure \ref{fig:FelevationProfile} plots the along corridor elevation profile for the best output corridor solution generated by the MOGADOR algorithm with an initial seed population of 100,000. As the profile plot reveals, for the Fresno -- Tulare region, the corridor solution actually routes along a path of decreasing elevation from the source to the destination. This feature is unique among all of the case study regions, with all of the four others involving a route that moves progressively uphill to a higher elevation location. 
         
         \begin{figure}[!h]
             \begin{center}
@@ -863,12 +883,10 @@ Figure \ref{fig:SASBelevationProfile} plots the along corridor elevation profile
             \label{fig:FelevationProfile}
             \end{center}
         \end{figure}
-        
-    \subsection{Anticipated Distribution of Life Cycle Energy Usages and Net Water Savings}
 
 \clearpage
     
-\section{Evaluating Algorithm Runtime Performance}
+\section{Evaluating the MOGADOR Algorithm's Runtime Performance}
 
     \begin{figure}[!h]
         \begin{center}
@@ -886,7 +904,7 @@ Figure \ref{fig:SASBelevationProfile} plots the along corridor elevation profile
         \end{center}
     \end{figure}
 
-\section{Evaluating Algorithm Solution Quality}
+\section{Evaluating the MOGADOR Algorithm's Solution Quality}
 
     \begin{figure}[!h]
         \begin{center}
