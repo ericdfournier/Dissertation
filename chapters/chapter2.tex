@@ -79,16 +79,16 @@ Figure \ref{fig:mogador-pseudocode} provides a pseudocode description of the MOG
                 \end{algorithmic}
                 \end{algorithm}
                 
-            \begin{figure}[MOGADOR Algorithm Pseudocode]
+            \begin{figure}[!h]
             \caption[MOGADOR Algorithm Pseudocode]{MOGADOR Algorithm Pseudocode}
             \label{fig:mogador-pseudocode}
             \end{figure}
     
 \section{The MOGADOR Data Structure}
     
-The optimal data structure for use in concert with the MOGADOR algorithm is a nested list of lists. Such a list based data structure is well suited to this context as there can be a high degree of variability in the number of elements produced by the different stochastic genetic operators.1 Figure \ref{fig:data-structure} illustrates a small but valid example such a nested list of lists data structure as used in the context of the MOGADOR algorithm. Note, for example, how the number of row column index vectors $n$ in the first individual $\textbf{I}_1$ equals 5, while the number of index vectors in subsequent individuals $\textbf{I}_{2:4}$ belonging to the same population, ranges between 3 and 6. The source of this variation has to do with the stochasticity inherent to the population initialization routine. Similarly, note how the number of populations $g$ in the first evolution $\textbf{E}_1$ is 3 while the number of populations in the second evolution is 4. The source of this variation has to do with the stochasticity in the crossover and mutation processes. Indeed, the only level of the data structure's hierarchy at which a constant number of elements is required is at the population level. Meaning, in other words, that each population $\textbf{P}_g$ contained within evolutions $\textbf{E}_b$ must all possess the same number of $m$ individuals. This requirement ensures that the behavior of the genetic operators is consistent between separate evolutions.
+The optimal data structure for use in concert with the MOGADOR algorithm is a nested list of lists. Such a list based data structure is well suited to this context as there can be a high degree of variability in the number of elements produced by the different stochastic genetic operators. Figure \ref{fig:data-structure} illustrates a small but valid example such a nested list of lists data structure as used in the context of the MOGADOR algorithm. Note, for example, how the number of row column index vectors $n$ in the first individual $\textbf{I}_1$ equals 5, while the number of index vectors in subsequent individuals $\textbf{I}_{2:4}$ belonging to the same population, ranges between 3 and 6. The source of this variation has to do with the stochasticity inherent to the population initialization routine. Similarly, note how the number of populations $g$ in the first evolution $\textbf{E}_1$ is 3 while the number of populations in the second evolution is 4. The source of this variation has to do with the stochasticity in the crossover and mutation processes. Indeed, the only level of the data structure's hierarchy at which a constant number of elements is required is at the population level. Meaning, in other words, that each population $\textbf{P}_g$ contained within evolutions $\textbf{E}_b$ must all possess the same number of $m$ individuals. This requirement ensures that the behavior of the genetic operators is consistent between separate evolutions.
             
-            \begin{figure}[MOGADOR Algorithm Data Structure]
+            \begin{figure}[!h]
             \centering
             \includegraphics[width=5.5in]{figures/data-structure.png}   
             \caption[MOGADOR Algorithm Data Structure]{MOGADOR Algorithm Data Structure}
@@ -100,7 +100,7 @@ The optimal data structure for use in concert with the MOGADOR algorithm is a ne
 A novel population initialization procedure has been developed for use in conjunction with the MOGADOR algorithm which improves the global quality of the output solution set while simultaneously reducing overall computational effort. At its core, this novel pseudo-random walk algorithm works by repeatedly sampling a dynamically parameterized bivariate Gaussian distribution. The generic form of the probability density function for the bivariate Gaussian distribution can be written as Equation \ref{eq:bivariateNormalPDF} \cite{Johnson2002}. Here, the bivariate Gaussian PDF $f(\boldsymbol{\tau})$ is function of two inputs. [1] The first is a mean vector $\boldsymbol{\mu}$, comprised of the means $(\mu_1, \mu_2)$ of two continuous random variables $(\tau_1, \tau_2)$. [2] The second is a covariance matrix $\boldsymbol{\Sigma}$, comprised of the pairwise covariances $\sigma$ for all possible combinations of the continuous random variables $(\tau_1, \tau_2)$.
             
             \begin{equation}
-            f(\boldsymbol{\tau}) = \frac{1}{ \sqrt{ (2\pi)^2 \mid \boldsymbol{\Sigma} \mid} } e^{ \frac{-1}{2} ( \boldsymbol{\tau} - \boldsymbol{\mu} )^T \boldsymbol{ \Sigma}^{-1} ( \boldsymbol{\tau} - \boldsymbol{\mu} ) }
+            f(\boldsymbol{\tau}) = \frac{1}{ \sqrt{ (2\pi)^2 \mid \boldsymbol{\Sigma} \mid} } \exp{ \frac{-1}{2} ( \boldsymbol{\tau} - \boldsymbol{\mu} )^T \boldsymbol{ \Sigma}^{-1} ( \boldsymbol{\tau} - \boldsymbol{\mu} ) }
             \label{eq:bivariateNormalPDF}
             \end{equation}
 
@@ -111,7 +111,7 @@ A novel population initialization procedure has been developed for use in conjun
             \\
             $\boldsymbol{\mu} = $ The set of mean values $(\mu_1, \mu_2)$ for $(\tau_1, \tau_2)$
             \\
-            $\boldsymbol{\Sigma} =$ The pairwise covariance structure $\bigl[\begin{smallmatrix} \sigma(\tau_{1},\tau_{1}) & \sigma(\tau_{1},\tau_{2}) \\ \sigma(\tau_{2},\tau_{1}) & \sigma(\tau_{2},\tau_{2}) \\ \end{smallmatrix}\bigr]$ for $(\tau_{1}, \tau_{2})$
+            $\boldsymbol{\Sigma} =$ The pairwise covariance structure $\Biggl[\begin{matrix} \sigma(\tau_1,\tau_1), & \sigma(\tau_1,\tau_2) \\ \sigma(\tau_2,\tau_1), & \sigma(\tau_2,\tau_2) \\ \end{matrix}\Biggr]$ for $(\tau_{1}, \tau_{2})$
             \end{center}
             
 Each sampled value for $\tau_1, \tau_2$ can be reduced to a unit vector and interpreted as a set of row column index deltas. The repeated sampling of the distribution therefore provides a simple yet powerful technique for generating randomized positional changes within a 2-D lattice. Additionally, as shall be discussed in the subsequent sections, the ability to dynamically adjust the parameters of the bivariate Gaussian PDF at any time during the sampling process provides a mechanism by which one is able to functionally constrain the randomness of the walk; hence the term: pseudo-random walk.
@@ -147,7 +147,7 @@ Figure \ref{fig:pseudo-random-walk-pseudocode} provides a pseudocode representat
                 \end{algorithmic}
                 \end{algorithm}
                 
-            \begin{figure}[Pseudo-Random Walk Algorithm Pseudocode]
+            \begin{figure}[!h]
             \caption[Pseudo-Random Walk Algorithm Pseudocode]{Pseudo-Random Walk Algorithm Pseudocode}
             \label{fig:pseudo-random-walk-pseudocode}
             \end{figure}
@@ -209,7 +209,7 @@ The stochastic processes inherent to the pseudo-random walk procedure, as well a
             
 The first of these investigations seeks to understand the role of the fixed parameter $q$, embedded in the pseudo-random walk covariance generator function, in determining the structural characteristics of output populations. In order to study this issue, a synthetic problem statement was created. This problem statement involves a square search domain of 100 nodes on a side – resulting in a total problem size of $\boldsymbol\Omega = 10,000$ nodes. The value of the estimated objective function $\hat{O}_w$ used to evaluate fitness was set as constant for all of the nodes in the search domain. In this way, the objective score is roughly equivalent to individual walk length in Euclidean space. Using this problem statement, twenty seed populations, all containing $m = 100$ individuals, were generated  using monotonically increasing values of $q$ beginning with $q = 0.5$ and concluding with $q = 10$. For each the generated populations, the average objective scores for all individuals as well as the standard deviation of the objective scores among individuals were evaluated. The results of this empirical investigation are presented in Figure \ref{fig:path-randomness}.
             
-            \begin{figure}[Observing the Role of the Fixed Parameter $q$ in Determining Individual Path Randomness]
+            \begin{figure}[!h]
             \centering
             \includegraphics[width=5.5in]{figures/path-randomness-study.png}
             \caption[Observing the Role of the Fixed Parameter $q$ in Determining Individual Path Randomness]{Observing the Role of the Fixed Parameter $q$ in Determining Path Randomness}
@@ -220,7 +220,7 @@ As Figure \ref{fig:path-randomness} illustrates, increasing the value of the fix
             
 Another issue warranting empirical investigation is the relationship between runtime performance of the proposed initialization procedure and problem size. In order to study this issue a series of ten synthetic problem statements were constructed with near identical structural components; differing from on another only in terms of problem size. In each of these problem statements the source location was positioned one fifth of the way down and to the right from the top left of the search domain and, likewise, the destination location was positioned a constant one fifth of the way up from the bottom right corner of the search domain. For all of the different populations generated, the value of the fixed parameter $q$ was set relatively high $q = 10$ to reduce computational effort.
             
-            \begin{figure}[Observing the Role of Problem Size on Initialization Runtime]
+            \begin{figure}[!h]
             \centering
             \includegraphics[width=5.5in]{figures/problem-size-study.png}
             \caption[Observing the Role of Problem Size on Initialization Runtime]{Observing the Role of Problem Size on Initialization Runtime}
@@ -231,7 +231,7 @@ The plot to the left of Figure \ref{fig:problem-size} illustrates the the distri
             
 One of the considerations previously discussed related to the initialization of the MOGADOR algorithm in the context of large problem statements was the need to ensure sufficient diversity within the seed population for the search process to be conducted at the global level. This problem is clearly evident in the population search extent and frequency image contained on the far right of Figure \ref{fig:problem-size}.  In this example, the population clearly fails to explore a sufficiently large portion of the decision space to be considered as a form of global search. The solution which was previously proposed to this problem involved generating so called multi-part pseudo-random walks. The subsequent investigation therefore, compares the statistical characteristics of a set of populations generated from standard pseudo-random walk to another set of population generated from multi-part pseudo random walks. The results of this investigation are provided in Figure \ref{fig:multi-part-walk-study}.
             
-            \begin{figure}[Observing the Characteristics of Multi-Part Pseudo-Random Walks]
+            \begin{figure}[!h]
             \centering
             \includegraphics[width=5.5in]{figures/multi-part-walk-study.png}
             \caption[Observing the Characteristics of Multi-Part Pseudo-Random Walks]{Observing the Characteristics of Multi-Part Pseudo-Random Walks}

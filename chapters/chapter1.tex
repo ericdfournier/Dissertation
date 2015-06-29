@@ -131,13 +131,45 @@ The raw input datasets which were selected for the example implementation were c
 
 \section{The Geographic Unit of Analysis}
     
-    The geographic unit of analysis selected for this example implementation is the US Geologic Survey (USGS) Hydrologic Unit Code (HUC) level five watershed. Specifically, the level five watershed areas contained within the administrative boundaries of the state of California. According to the USGS: 
+The geographic unit of analysis selected for this example implementation is the US Geologic Survey (USGS) Hydrologic Unit Code (HUC) level five watershed. Specifically, the level five watershed areas contained within the administrative boundaries of the state of California. According to the USGS:
+
     \blockquote{\textit{The United States is divided and sub-divided into successively smaller hydrologic units which are classified into four levels: regions, sub-regions, accounting units, and cataloging units. The hydrologic units are arranged or nested within each other, from the largest geographic area (regions) to the smallest geographic area (cataloging units). Each hydrologic unit is identified by a unique HUC consisting of two to twelve digits based on the levels of classification in the hydrologic unit system. \cite{Seaber1987}}}
-    The level five designation within this HUC framework is comprised of closed contiguous regions possessing an average area of $588$ square kilometers. These level five HUC designated areas are often referred to as the HUC-10 watersheds because of their use of a ten digit unique numerical identification code. Within the state of California, there are 1,040 individual HUC-10 watersheds. These watersheds are non-overlapping and have been derived algorithmically from the national elevation dataset by USGS scientists according to the method described by \cite{Seaber1987}.
+    
+The level five designation within this HUC framework is comprised of closed contiguous regions possessing an average area of $588$ square kilometers. These level five HUC designated areas are often referred to as the HUC-10 watersheds because of their use of a ten digit unique numerical identification code. Within the state of California, there are 1,040 individual HUC-10 watersheds. These watersheds are non-overlapping and have been derived algorithmically from the national elevation dataset by USGS scientists according to the method described by \cite{Seaber1987}.
+    
+\section{Graphical User Interface}
+   
+The WOSS toolset can be interactively parameterized via the the GUI depicted in Figure \ref{fig:GUIpart1}. The GUI is presented as a three step workflow, with each step building iteratively upon the product of the previous one to generate a final composite output. The first step involves the user providing the directory location of the shapefile from which the reference geometry will be selected. The user is presented with the option of specifying an alternative "Overlay Shapefile" that can be used to aid in the selection of this reference area. The second step involves the use of this overlay shapefile to generate an interactive map window that will appear to the user once it is time for the reference boundary to be selected. It should be noted that the reference shapefile always provides the source data from which the actual selection is made. 
+
+Next, the user is then prompted to input parameter values for two fields. The first corresponds to the grid density that will be used to generate all of the output layers. The default setting for this parameter is $1,169.99$. This grid cell density roughly corresponds to cells that are ($100$ $m$ x $100$ $m$) or $10,000$ $m^2$  within the latitude range bounding the state of California. The second input parameter value corresponds to the attribute field name in the reference shapefile that will be used for the output reference grid encoding. The attribute field must be of numerical type. 
+
+         \begin{figure}[!h]
+            \includegraphics[width=5.5in]{figures/gui_fig1.jpg}
+            \caption{An overview of Step \#1 in the GUI based workflow: parameterizing the reference grid.}
+            \label{fig:GUIpart1}
+        \end{figure}
+
+Once the user correctly provides all of these inputs they are then allowed to move onto the second step of the workflow which by clicking on the \textit{\textbf{Select Reference Boundary}} button. During this step a map axis is generated in which the geometry information for the overlay shapefile is drawn on screen as shown in Figure \ref{fig:GUIpart2}. The user may then select their desired reference polygon by simply clicking on the appropriate location within the map. The latitude longitude coordinates corresponding to this selection are automatically used to extract the containing polygon from the reference shapefile. This polygon is then automatically converted to a reference grid with the cell density and attribute field encoding parameters designated by the user.
+
+         \begin{figure}[!h]
+            \includegraphics[width=5.5in]{figures/gui_fig2.jpg}
+            \caption{An overview of Step \#2 in the GUI based workflow: selecting the reference polygon from the overlay shapefile geometry.}
+            \label{fig:GUIpart2}
+         \end{figure}
+
+The third step of the GUI based workflow, shown in Figure \ref{fig:GUIpart3}, involves the user providing the directory locations of the various spatial data inputs that are to be processed. These inputs should be organized according to the general directory layout described in the preceding section. Once these top level directory locations have been provided, the names of the raw input data layers are automatically populated into the accompanying tables and the users are prompted to provide one more parameter value for each vector and raster data category. For the raw input raster datasets, the users are requested to input to the table the numerical encoding of any \textit{NaN} values. If none is present the field may simply be left blank. For the raw input vector datasets, the users are requested to input the text encoded name of the attribute fields on the basis of which the output grid layers will be encoded. Here again, as with the generation of the reference grid, these attribute field names should correspond to numerically encoded values.
+
+         \begin{figure}[!h]
+            \includegraphics[width=5.5in]{figures/gui_fig3.jpg}
+            \caption{An overview of Step \#3 in the GUI based workflow: selecting the reference polygon from the overlay shapefile geometry.}
+            \label{fig:GUIpart3}
+         \end{figure}
+         
+Following successful completion of the various data processing steps the user is then allowed to choose whether they want to save the output layer stack directly into the MATLAB workspace via the \textit{\textbf{Extract Data to Workspace}} button, or to disk in a file encoded as either as a set of GeoTiff (.tiff) formatted rasters or a single MATLAB binary (.mat) via the \textit{\textbf{Extract Data to File}} button.
     
 \section{The WOSS Model Outputs}
     
-    ~Figure \ref{fig:SampleOutput} illustrates a set of sample outputs that were generated by the data preprocessing components of the toolset for an example HUC-10 reference boundary. The reference boundary can either be selected manually, by calling a function which prompts the user to click on map with all of the HUC-10 boundaries drawn on it, or automatically, by specifying the 10-digit code corresponding to the desired HUC-10 watershed. The toolset processes generate an output layer stack -- the individual component layers of which are illustrated in the colored inset map panels. Only layers for which there is at least one non-empty data value are included in the generated outputs. Thus, the number of output components may vary depending upon the coverage of the input data layers relative to the domain of the reference boundary. For vector data inputs, the values which are contained in the output are those corresponding to a single attribute field selected by the user. This field must be either a real or coded numeric data type as the raster data format does not support the native representation of categorical variables.
+Figure \ref{fig:SampleOutput} illustrates a set of sample outputs that were generated by the data preprocessing components of the toolset for an example HUC-10 reference boundary. The reference boundary can either be selected manually, by calling a function which prompts the user to click on map with all of the HUC-10 boundaries drawn on it, or automatically, by specifying the 10-digit code corresponding to the desired HUC-10 watershed. The toolset processes generate an output layer stack -- the individual component layers of which are illustrated in the colored inset map panels. Only layers for which there is at least one non-empty data value are included in the generated outputs. Thus, the number of output components may vary depending upon the coverage of the input data layers relative to the domain of the reference boundary. For vector data inputs, the values which are contained in the output are those corresponding to a single attribute field selected by the user. This field must be either a real or coded numeric data type as the raster data format does not support the native representation of categorical variables.
     
         \begin{figure}[!h]
             \includegraphics[width=5.5in]{figures/example_data_output.png}
@@ -145,6 +177,6 @@ The raw input datasets which were selected for the example implementation were c
             \label{fig:SampleOutput}
         \end{figure}
 
-    The toolset structure allows for the automated repetition of this data preprocessing workflow for a large number of reference boundaries. In this case study implementation, for example, the toolset was used to prepare a single such output layers stack for each of the 1,040 individual HUC-10 reference boundaries contained within the state of California. With these outputs, a corresponding the MCSS analysis could then be easily conducted for any or every such HUC-10 watershed in the State.
+The toolset structure allows for the automated repetition of this data preprocessing workflow for a large number of reference boundaries. In this case study implementation, for example, the toolset was used to prepare a single such output layers stack for each of the 1,040 individual HUC-10 reference boundaries contained within the state of California. With these outputs, a corresponding the MCSS analysis could then be easily conducted for any or every such HUC-10 watershed in the State.
     
 \clearpage   
