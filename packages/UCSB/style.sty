@@ -31,23 +31,30 @@
 }
 
 \renewcommand{\maketitle}{
-	\thispagestyle{empty}
+	\thispagestyle{empty} 
     \vspace*{\fill}
 	%\vspace{100pt}
 	\begin{center}
-	\textsc{\@university\\ \@universitycity, \@universitystate\\
-	\@degreemonth\ \@degreeyear \\}
+	\textsc{\@university\\}
 	\vspace{72pt}
 	\Huge \textcolor{SchoolColor}{\thetitle} \normalsize \\
 	\vspace{72pt}
-	\textsc{A Dissertation presented \\ by\\
-	\theauthor\\ to\\ The Bren School of \@department\\
+	\textsc{A Dissertation submitted in partial satisfaction \\
+	of the requirements for the degree \\ 
+	of \\
+	\@degree\\
+	in \\
+	\@department\\
 	\vspace{24pt}
-	in partial fulfillment of the requirements for the degree \\
-    of \\ \@degree\\
+	by \\
+	\theauthor\\
     \vspace{24pt}
-	in the subject \\ 
-	of \\ \@field\\}
+    Committee in charge \\
+    Professor Arturo A. Keller, Chair \\
+    Associate Professor James Frew \\
+    Associate Professor Roland Geyer \\
+    \vspace{24pt}
+    \@degreemonth\ \@degreeyear }
 	\vspace*{\fill}
 	\end{center} 
 }
