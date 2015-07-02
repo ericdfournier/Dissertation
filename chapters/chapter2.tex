@@ -12,9 +12,9 @@
  
 \newthought{The source of location} for the delivery of treated wastewater for artificial groundwater recharge applications is always the Wastewater Treatment Plant (WWTP). WWTPs are overwhelming located at low elevation points within the hydrological basins that they serve; as this feature ensures a minimum energy input requirement to deliver wastewater from its distributed sites of generation (i.e. the many homes and businesses distributed geographically throughout the basin) to a single centralized point of treatment. In this way, a system design based upon a single centralized WWTP is best able to take advantage of the use of gravity to provide the motive force for the wastewater's journey through the system. As a side note, an question which may become of substantial future interest is how a more prominent role of reuse may alter our thinking about the optimal design of water treatment collection and conveyance infrastructure. Specifically, it remains an open research question as to whether or not the existing paradigm, with large centrally location treatment facilities, would persist as the most favorable solution if one were charged with designing an integrated wastewater treatment and reuse system from the oft.
                 
-The salient output of the first model component - WOSS - is the designation of one or more suitable sites for the placement of either a gravity fed surface spreading infiltration basin or a pump driven subsurface recharge well. In this way, we are left with one or many (in the case of multiple suitable sites) combinations of point source and destination locations. The next modeling challenge which must be overcome therefore is the development of a scheme for generating plausible pathways which connect the source locations to the various destinations. The implicit assumption here being, that in order to deliver the treated wastewater from its source of production, the WWTP, to the end point of use, the recharge site, new water conveyance infrastructure must be constructed.
+The salient output of the first model component -- WOSS -- is the designation of one or more suitable sites for the placement of either a gravity fed surface spreading infiltration basin or a pump driven subsurface recharge well. In this way, we are left with one or many -- in the case of multiple suitable sites -- combinations of point source and destination locations. The next modeling challenge which must be overcome therefore is the development of a scheme for generating plausible pathways which connect the source locations to the various destinations. The implicit assumption here being, that in order to deliver the treated wastewater from its source of production, the WWTP, to the end point of use, the recharge site, new water conveyance infrastructure must be constructed.
         
-At this stage it is important to pause to consider whether or not the construction of new water conveyance infrastructure is in fact a necessary condition of all or any water reuse projects. There are two perspectives from which a response to this objection can be framed. The first is technical in nature. If no new conveyance structure is implemented, two fundamental technical requirements must be met. The first is that the point of reuse must be situated favorably with respect to the existing potable water conveyance system such that it can be readily be connected to, and withdraw from it, large quantities of water for recharge purposes. The second is that the treated wastewater which is to be reused must be returned to a sufficiently high standard of quality such that it can be reincorporated directly back into the potable water supply. This second constraint, while technically feasible given sufficient financial resources, leads naturally to the other category of potential objections to the development of a reuse project without the addition of new conveyance infrastructure: namely, the social stigma associated with co-mingling so-called reclaimed "black water," with the potable freshwater supply. There is a considerable body of research in the social sciences which suggests that a majority of people harbor a very basic, if somewhat irrational, prejudice against the direct reuse of reclaimed water for potable applications. 
+At this stage it is important to pause to consider whether or not the construction of new water conveyance infrastructure is in fact a necessary condition of all or any water reuse projects. There are two perspectives from which a response to this objection can be framed. The first is technical in nature. If no new conveyance structure is implemented, two fundamental technical requirements must be met. The first is that the point of reuse must be situated favorably with respect to the existing potable water conveyance system such that it can be readily be connected to, and withdraw from it, large quantities of water for recharge purposes. The second is that the treated wastewater which is to be reused must be returned to a sufficiently high standard of quality such that it can be reincorporated directly back into the potable water supply. This second constraint, while technically feasible given sufficient financial resources, leads naturally to the other category of potential objections to the development of a reuse project without the addition of new conveyance infrastructure: namely, the social stigma associated with co-mingling so-called reclaimed \textit{black water}, with the potable freshwater supply. There is a considerable body of research in the social sciences which suggests that a majority of people harbor a very basic, if somewhat irrational, prejudice against the direct reuse of reclaimed water for potable applications. 
             
 \section{The Multi-Objective Corridor Location Problem}
             
@@ -49,40 +49,41 @@ Genetic Algorithms (GAs) are a family of search heuristics that mimic the proces
             
 \section{The MOGADOR Algorithm}
             
-MOGADOR is an acronym stands for “Multiple Objective Genetic Algorithm for Corridor Selection Problems.” \cite{Zhang2008} The algorithm was introduced as a novel genetic approach to the problem of multi-objective corridor search. \cite{Mooney2006, Zhang2008} It development was intended to service need for a robust method of siting optimal corridors relevant to a variety of environmental planning and design applications. \cite{Bennett2004, Chakhar2003, Zhou1996} A need which persisted despite numerous previous efforts to adapt general purpose, deterministic, SSP solution techniques for use in corridor location. \cite{Hallam2001, Jankowski1995, Lombard1993} The continued need for refined algorithmic approaches to the location of optimal corridors within a broad range of application domains is evidenced by the continued appearance of closely related publications during the intervening years. \cite{Aissi2012, Mousseau2010, Neema2010, Roberts2010, Scaparra2014, Tsai2011} 
+MOGADOR is an acronym stands for: \textit{Multiple Objective Genetic Algorithm for Corridor Selection Problems}. \cite{Zhang2008} The algorithm was introduced as a novel genetic approach to the problem of multi-objective corridor search. \cite{Mooney2006, Zhang2008} It development was intended to service need for a robust method of siting optimal corridors relevant to a variety of environmental planning and design applications. \cite{Bennett2004, Chakhar2003, Zhou1996} A need which persisted despite numerous previous efforts to adapt general purpose, deterministic, SSP solution techniques for use in corridor location. \cite{Hallam2001, Jankowski1995, Lombard1993} The continued need for refined algorithmic approaches to the location of optimal corridors within a broad range of application domains is evidenced by the continued appearance of closely related publications during the intervening years. \cite{Aissi2012, Mousseau2010, Neema2010, Roberts2010, Scaparra2014, Tsai2011} 
 
-Relative to other traditional shortest path finding routines, the MOGADOR algorithm has been observed to possess a number of favorable characteristics. First among these is the ability of MOGADOR to accommodate large problem statements (large $\boldsymbol{\Omega}$) and or those which require the simultaneous evaluation of large numbers of independent objectives (large $w$) \cite{Pangilinan2007, Zhang2008}. Another useful feature of the MOGADOR algorithm is its ability to generate an entire solution set from a single run – as opposed to the single solution per run which is typical of traditional SPP algorithms \cite{Cherkassky1996, Dreyfus1969, Hart1968, Zhang2008}. Lastly, but perhaps most importantly, is that when properly parameterized, each of the solutions generated by the MOGADOR algorithm can be said to be non-inferior to every other \cite{Zhang et al 2008}. In this way, the output solution set approximates the so called Pareto optimal solution set for the given problem statement \cite{Deb 2014}.  
+Relative to other traditional shortest path finding routines, the MOGADOR algorithm has been observed to possess a number of favorable characteristics. First among these is the ability of MOGADOR to accommodate large problem statements (large $\boldsymbol{\Omega}$) and or those which require the simultaneous evaluation of large numbers of independent objectives (large $w$) \cite{Pangilinan2007, Zhang2008}. Another useful feature of the MOGADOR algorithm is its ability to generate an entire solution set from a single run -- as opposed to the single solution per run which is typical of traditional SPP algorithms \cite{Cherkassky1996, Dreyfus1969, Hart1968, Zhang2008}. Lastly, but perhaps most importantly, is that when properly parameterized, each of the solutions generated by the MOGADOR algorithm can be said to be non-inferior to every other \cite{Zhang2008}. In this way, the output solution set approximates the so called Pareto optimal solution set for the given problem statement \cite{Deb2014}.  
 
 In order to proceed with our discussion of the MOGADOR algorithm, some basic terminology must first be defined. In the context of the MOGADOR algorithm a single gene $\textbf{x}$ is comprised of a pair of row column indices $(r,c)$ to a geographically referenced 2-D array comprising the feasible search domain $\boldsymbol{\Omega}$. An individual $\textbf{I}_m$ is comprised of a sequence of row column index vectors $\textbf{x}_n$ which collectively form a valid pathway between a predefined set of source ${}^{s}\textbf{x}$ and destination ${}^{d}\textbf{x}$ locations. In this way, each individual represents a feasible solution to the proposed corridor location problem. A population $\textbf{P}_g$ is comprised of $m$ individuals. And, finally, an evolution $\textbf{E}_b$ is comprised of $g$ populations.
 
 Figure \ref{fig:mogador-pseudocode} provides a pseudocode description of the MOGADOR algorithm. Its structural components are fairly typical among GAs in general. The search process begins with a stochastic routine for generating of an initial seed population $\textbf{P}_1$. Following the initialization of this seed population, the fitness $\textbf{F}_1$ of each individual in the seed population is computed by summing the objective function scores corresponding to each set of nodes comprising each individual. Upon the completion of this initialization phase, the algorithm then enters a loop wherein successive genetic operations are applied to the initial seed population. In the case of MOGADOR, these operators include: the selection individuals for reproduction on the based upon their fitness, the crossover of selected individuals that share at least one common feature, and finally, the mutation of crossed over individuals so as to maintain a degree of random variation within the population. At the end of each loop iteration a new population is generated, its fitness evaluated, and a convergence parameter computed on the basis of the observed rate of improvement in population fitness across previous iterations. If convergence is achieved $(c_g < {}^{t}c)$ the loop is broken and the algorithm terminates returning: the evolutionary history of the population $\textbf{P}_{1:g}$, the corresponding fitness values each individual within the population $\textbf{F}_{1:g}$, and the convergence parameter history $\textbf{C}_{1:g}$. \\
-
-                \begin{algorithm}
-                \caption{}\label{euclid}
-                \begin{algorithmic}[1]
+               
+        \begin{figure}[!h]
+        \begin{centering}
+        \label{euclid}
+            \begin{algorithmic}[1]
                 \Procedure{MOGADOR}{}
-                \State $g = 1 \gets$ initialize loop iterator
-                \State $c_g = 0 \gets$ initialize convergence parameter
-                \State \textbf{P}$_g = initializeSeedPopulation(m,\boldsymbol\Omega)$
-                \State \textbf{F}$_g = computePopulationFitness($\textbf{P}$_g,\hat{O}_w)$ 
-                \While{$c_g < $ \textsuperscript{\textit{t}}$c$}{}:
-                \State $g += 1 \gets$ update loop iterator
-                \State \textbf{S}$_g = selectIndividualsFromPopulation($\textbf{P}$_g)$
-                \State \textbf{X}$_g = crossoverSelectedIndividuals($\textbf{S}$_g)$
-                \State \textbf{P}$_g = mutateCrossoverIndividuals($\textbf{X}$_g)$
-                \State \textbf{F}$_g = computePopulationFitness($\textbf{P}$_g)$
-                \State $c_g = computeConvergenceParameter($\textbf{F}$_{1:g})$
-                \State \textbf{end}
-                \EndWhile
-                \State \textbf{return: \textbf{P}$_{1:g},$ \textbf{F}$_{1:g},$ \textbf{C}$_{1:g}$}
+                         
+                    \State $g = 1 \gets$ initialize loop iterator
+                    \State $c_g = 0 \gets$ initialize convergence parameter
+                    \State \textbf{P}$_g = initializeSeedPopulation(m,\boldsymbol\Omega)$
+                    \State \textbf{F}$_g = computePopulationFitness($\textbf{P}$_g,\hat{O}_w)$ 
+                    \While{$c_g < $ \textsuperscript{\textit{t}}$c$}{}:
+                    \State $g \mathrel{+}= 1 \gets$ update loop iterator
+                    \State \textbf{S}$_g = selectIndividualsFromPopulation($\textbf{P}$_g)$
+                    \State \textbf{X}$_g = crossoverSelectedIndividuals($\textbf{S}$_g)$
+                    \State \textbf{P}$_g = mutateCrossoverIndividuals($\textbf{X}$_g)$
+                    \State \textbf{F}$_g = computePopulationFitness($\textbf{P}$_g)$
+                    \State $c_g = computeConvergenceParameter($\textbf{F}$_{1:g})$
+                    \State \textbf{end}
+                    \EndWhile
+                    \State \textbf{return: \textbf{P}$_{1:g},$ \textbf{F}$_{1:g},$ \textbf{C}$_{1:g}$}
+                    
                 \EndProcedure
-                \end{algorithmic}
-                \end{algorithm}
-                
-            \begin{figure}[!h]
-            \caption[MOGADOR Algorithm Pseudocode]{MOGADOR Algorithm Pseudocode}
-            \label{fig:mogador-pseudocode}
-            \end{figure}
+            \end{algorithmic}
+        \end{centering}
+        \caption{MOGADOR Algorithm Pseudocode.}
+        \label{fig:mogador-pseudocode}
+        \end{figure}
     
 \section{The MOGADOR Data Structure}
     
@@ -118,37 +119,38 @@ Each sampled value for $\tau_1, \tau_2$ can be reduced to a unit vector and inte
             
 Figure \ref{fig:pseudo-random-walk-pseudocode} provides a pseudocode representation of the proposed pseudo-random walk procedure. Structurally, the routine consists of two nested while loops. At each iteration $h$ of the outer loop a single step $\textbf{x}_n$ along an individual walk $\textbf{I}_m$ is taken. This loop continues until the location of the current step is equal to that of the destination ${}^{d}\textbf{x}$. At each iteration $u$ of the inner loop a candidate next step $\Delta \textbf{x}_u$ is produced by random sampling the parameterized bivariate Gaussian PDF $f(\textbf{x}_u)$. Candidate next steps are only considered valid if they are contained within the current valid connected set $\textbf{V}_n$. The current valid connected set is comprised of all neighboring nodes that not been previously visited and that are inclusive to the search domain $\boldsymbol{\Omega}$.  If the candidate step is found to be valid the inner loop terminates, the outer loop iterates, and the walk process continues. If the valid set is ever found to be empty the outer loop iterator $h$ is reset and the entire process is restarted. \\
             
-                \begin{algorithm}
-                \caption{}\label{euclid}
+            \begin{figure}[!h]
+            \begin{centering}
+            \label{euclid}
                 \begin{algorithmic}[1]
                 \Procedure{PSEUDO-RANDOM WALK}{}
-                \State $n = 1 \gets$ initialize outer loop iterator
-                \State $\textbf{x}_n =$ \textsuperscript{\textit{s}}$\textbf{x} \gets$ initialize individual at source
-                \State \textbf{I}$^{*} = computeEuclideanShortestPath($\textsuperscript{\textit{s}}$\textbf{\textit{x}},$\textsuperscript{\textit{d}}$\textbf{x})$
-                \While{$\textbf{x}_n \neq$ \textsuperscript{\textit{d}}$\textbf{x}$}{}:
-                \State $\textbf{V}_n = computeValidConnectedSet(\textbf{x}_{1:n},\boldsymbol\Omega)$
-                \If{$\textbf{V}_n = \emptyset$}:
-                \State $n = 1 \gets$ reset outer loop iterator
-                \State \textbf{continue}
-                \EndIf
-                \State $u = 1 \gets$ initialize inner loop iterator
-                \State $\boldsymbol{\mu}_n = computeOrientationVector(\textbf{x}_n,$\textsuperscript{\textit{d}}$\textbf{x})$
-                \State $d_n = computeMinimumBasisDistance(\textbf{x}_{n},\textbf{I}^{*})$
-                \State $n = n + 1 \gets$ update outer loop iterator
-                \While{$\textbf{x}_n \not \in \textbf{V}_n$}{}:
-                \State $\Sigma_u = computeCovarianceMatrix(d_n,u)$
-                \State $\Delta\textbf{x}_u = sampleBivariateGaussianDistribution(\boldsymbol\mu_n,\Sigma_u)$
-                \State $\textbf{x}_{n} = \textbf{x}_{n-1} + \Delta\textbf{x}_{u}$
-                \State $u = u + 1 \gets$ update inner loop iterator
-                \EndWhile {}
-                \EndWhile {}
-                \State \textbf{return: $\textbf{x}_{1:n}$}
-                \EndProcedure
-                \end{algorithmic}
-                \end{algorithm}
                 
-            \begin{figure}[!h]
-            \caption[Pseudo-Random Walk Algorithm Pseudocode]{Pseudo-Random Walk Algorithm Pseudocode}
+                        \State $n = 1 \gets$ initialize outer loop iterator
+                        \State $\textbf{x}_n =$ \textsuperscript{\textit{s}}$\textbf{x} \gets$ initialize individual at source
+                        \State \textbf{I}$^{*} = computeEuclideanShortestPath($\textsuperscript{\textit{s}}$\textbf{\textit{x}},$\textsuperscript{\textit{d}}$\textbf{x})$
+                        \While{$\textbf{x}_n \neq$ \textsuperscript{\textit{d}}$\textbf{x}$}{}:
+                        \State $\textbf{V}_n = computeValidConnectedSet(\textbf{x}_{1:n},\boldsymbol\Omega)$
+                        \If{$\textbf{V}_n = \emptyset$}:
+                        \State $n = 1 \gets$ reset outer loop iterator
+                        \State \textbf{continue}
+                        \EndIf
+                        \State $u = 1 \gets$ initialize inner loop iterator
+                        \State $\boldsymbol{\mu}_n = computeOrientationVector(\textbf{x}_n,$\textsuperscript{\textit{d}}$\textbf{x})$
+                        \State $d_n = computeMinimumBasisDistance(\textbf{x}_{n},\textbf{I}^{*})$
+                        \State $n = n + 1 \gets$ update outer loop iterator
+                        \While{$\textbf{x}_n \not \in \textbf{V}_n$}{}:
+                        \State $\Sigma_u = computeCovarianceMatrix(d_n,u)$
+                        \State $\Delta\textbf{x}_u = sampleBivariateGaussianDistribution(\boldsymbol\mu_n,\Sigma_u)$
+                        \State $\textbf{x}_{n} = \textbf{x}_{n-1} + \Delta\textbf{x}_{u}$
+                        \State $u = u + 1 \gets$ update inner loop iterator
+                        \EndWhile {}
+                        \EndWhile {}
+                        \State \textbf{return: $\textbf{x}_{1:n}$}
+                        
+                \EndProcedure
+                \end{algorithmic}   
+            \end{centering}
+            \caption{Pseudo-Random Walk Algorithm Pseudocode}
             \label{fig:pseudo-random-walk-pseudocode}
             \end{figure}
             
@@ -173,11 +175,11 @@ One aspect of this process which warrants further discussion is the role of the 
 
 \section{Initializing Problems with Large Decisions Spaces}
     
-While the pseudo-random walk procedure can be used to generate an initial seed population for any MOGADOR problem statement; a number of circumstances have been identified in which the performance of the population initialization procedure can be further refined. [1] The first such situation involves problems with extremely large decision spaces – defined as being thousands grid cells or more on a side. [2] The second problem specifications where it is known, a-priori, that the Euclidean path connecting the source to the destination is not entirely feasible.
+While the pseudo-random walk procedure can be used to generate an initial seed population for any MOGADOR problem statement; a number of circumstances have been identified in which the performance of the population initialization procedure can be further refined. [1] The first such situation involves problems with extremely large decision spaces -- defined as being thousands grid cells or more on a side. [2] The second problem specifications where it is known, \textit{a-priori}, that the Euclidean path connecting the source to the destination is not entirely feasible.
             
 Historically, corridor location problems which have been posed in the context of extremely large decisions spaces (large Ω) have been considered infeasible both for conventional deterministic SPP optimization techniques as well as for heuristic approaches such as MOGADOR. With regards to MOGADOR, the source of this infeasibility stems from the huge runtime commitment associated with generating and processing populations containing a sufficient number of individuals so as to ensure that a sufficient amount of genetic diversity can be captured during the initialization phase to conduct a global search. 
 
-One strategy which can be employed to ensure enough genetic diversity is produced within the initial seed population without having to generate populations of unduly large size or populations with individuals characterized by a high degree of randomness, is the generation of so called multi-part pseudo random walks. This procedure can be thought of as somewhat analogous to orthogonal statistical sampling techniques such as Latin Hypercube sampling which are used to generate samples from a non-uniformly distributed population by first dividing it into equally probable subspaces (McKay et al 1979, Ye 1998). The implicit assumption here being that the fitness distribution of all possible corridors connecting a typical source and destination pair is similarly non-uniform.
+One strategy which can be employed to ensure enough genetic diversity is produced within the initial seed population without having to generate populations of unduly large size or populations with individuals characterized by a high degree of randomness, is the generation of so called multi-part pseudo random walks. This procedure can be thought of as somewhat analogous to orthogonal statistical sampling techniques such as Latin Hypercube sampling which are used to generate samples from a non-uniformly distributed population by first dividing it into equally probable subspaces \cite{McKay1979,Ye1998}. The implicit assumption here being that the fitness distribution of all possible corridors connecting a typical source and destination pair is similarly non-uniform.
             
             \begin{figure}[!h]
             \centering
@@ -201,7 +203,7 @@ An approach which has been developed to address such cases is the so called conc
             \label{fig:convex-multi-part-pseudo-random-walk-example}
             \end{figure}
             
-The concave multi-part walk process is described by the sequence of panels moving from left to right within Figure \ref{fig:convex-multi-part-pseudo-random-walk-example}. [1] In the first panel, on the far left, we can see a problem that has been posed in such a way that the Euclidean path connecting the source to the destination is not feasible as it exits the boundaries of the search domain. [2]  For brevity, the two subsequent steps are not shown as they are identical to steps 2-3 in the standard multi-part pseudo random walk procedure. These omitted steps involve the generation of candidate centroids from the connected components within the objective surface. The next illustrated step, shown in the panel second from left, involves computing all of the row column indices that are convex to the source location.Within this convex region a the first centroid $\epsilon_1$ is selected. Here again, the process can be unstructured, where the entire convex region is searched, or structured  (as shown), where the initial convex region is restricted to some maximum distance from the source. [3-4] From here, additional non-overlapping convex subregions are computed and candidate centroids iteratively selected from within them. [5] The centroid selection process concludes when the current convex region contains the destination location. [6] Finally, the source is connected to the destination, as in the simple multi-part case, by a series of pseudo-random walks constructed for sequential pairs of the selected centroids.
+The concave multi-part walk process is described by the sequence of panels moving from left to right within Figure \ref{fig:convex-multi-part-pseudo-random-walk-example}. [1] In the first panel, on the far left, we can see a problem that has been posed in such a way that the Euclidean path connecting the source to the destination is not feasible as it exits the boundaries of the search domain. [2]  For brevity, the two subsequent steps are not shown as they are identical to steps 2-3 in the standard multi-part pseudo random walk procedure. These omitted steps involve the generation of candidate centroids from the connected components within the objective surface. The next illustrated step, shown in the panel second from left, involves computing all of the row column indices that are convex to the source location. Within this convex region a the first centroid $\epsilon_1$ is selected. Here again, the process can be unstructured, where the entire convex region is searched, or structured  (as shown), where the initial convex region is restricted to some maximum distance from the source. [3-4] From here, additional non-overlapping convex subregions are computed and candidate centroids iteratively selected from within them. [5] The centroid selection process concludes when the current convex region contains the destination location. [6] Finally, the source is connected to the destination, as in the simple multi-part case, by a series of pseudo-random walks constructed for sequential pairs of the selected centroids.
 
 \section{Measuring Initialization Performance}
     
@@ -227,7 +229,7 @@ Another issue warranting empirical investigation is the relationship between run
             \label{fig:problem-size}
             \end{figure}
             
-The plot to the left of Figure \ref{fig:problem-size} illustrates the the distributional properties of the runtimes required to generate ten replicate populations for the ten problem statements of progressively increasing size – resulting in a total of $g = 100$ unique populations, each comprised of $m = 100$ individuals. Such repeated simulation is necessary as the proposed initialization routine is based upon a stochastic sampling process which can and will deliver variable runtimes for the repeated applications to the same problem context. One feature of note in this plot is the roughly linear relationship between the mean runtime and problem size for this type of pseudo-random walk based approach to the problem initialization procedure for the range of problem sizes considered. The two images to the right illustrate the effective search extent and frequency for the smallest and the largest populations generated during this investigation.
+The plot to the left of Figure \ref{fig:problem-size} illustrates the the distributional properties of the runtimes required to generate ten replicate populations for the ten problem statements of progressively increasing size -- resulting in a total of $g = 100$ unique populations, each comprised of $m = 100$ individuals. Such repeated simulation is necessary as the proposed initialization routine is based upon a stochastic sampling process which can and will deliver variable runtimes for the repeated applications to the same problem context. One feature of note in this plot is the roughly linear relationship between the mean runtime and problem size for this type of pseudo-random walk based approach to the problem initialization procedure for the range of problem sizes considered. The two images to the right illustrate the effective search extent and frequency for the smallest and the largest populations generated during this investigation.
             
 One of the considerations previously discussed related to the initialization of the MOGADOR algorithm in the context of large problem statements was the need to ensure sufficient diversity within the seed population for the search process to be conducted at the global level. This problem is clearly evident in the population search extent and frequency image contained on the far right of Figure \ref{fig:problem-size}.  In this example, the population clearly fails to explore a sufficiently large portion of the decision space to be considered as a form of global search. The solution which was previously proposed to this problem involved generating so called multi-part pseudo-random walks. The subsequent investigation therefore, compares the statistical characteristics of a set of populations generated from standard pseudo-random walk to another set of population generated from multi-part pseudo random walks. The results of this investigation are provided in Figure \ref{fig:multi-part-walk-study}.
             
@@ -242,6 +244,6 @@ The runtime reductions which can be achieved from the use of the multi-part pseu
             
 \section{The MOGADOR Algorithm Outputs}
 
-The output of the MOGADOR algorithm is the state of population at the time in which the algorithm has either achieved convergence or has been terminated upon reaching the specified limit for evolutionary iterations. This population contains the row-column subscripts for each individual corridor as well as the corresponding fitness values at each of the row column subscripts along the entire length of each individual corridor. These individuals are ranked on the basis of their aggregate cumulative fitness values. These values are computed by summing each objective value at each subscript location along the length of each individual corridor. Because this is a multi-objective context two individuals may have equivalent aggregate cumulative fitness scores yet the distribution of these scores across the various objectives may vary. This would represent a situation where those two individuals -- as independent solutions to the mulit-objective corridor location problem -- are \textit{Pareto Optimal} or, alternatively stated, inclusive of the \textit{non-dominated set}.
+The output of the MOGADOR algorithm is the state of population at the time in which the algorithm has either achieved convergence or has been terminated upon reaching the specified limit for evolutionary iterations. This population contains the row-column subscripts for each individual corridor as well as the corresponding fitness values at each of the row column subscripts along the entire length of each individual corridor. These individuals are ranked on the basis of their aggregate cumulative fitness values. These values are computed by summing each objective value at each subscript location along the length of each individual corridor. Because this is a multi-objective context two individuals may have equivalent aggregate cumulative fitness scores yet the distribution of these scores across the various objectives may vary. This would represent a situation where those two individuals -- as independent solutions to the mulit-objective corridor location problem -- are \textit{Pareto optimal} or, alternatively stated, inclusive of the \textit{non-dominated set}.
 
 \clearpage
