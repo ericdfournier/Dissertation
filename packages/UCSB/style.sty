@@ -35,10 +35,11 @@
     \vspace*{\fill}
 	%\vspace{100pt}
 	\begin{center}
+	\doublespacing
 	\textsc{\@university\\}
-	\vspace{72pt}
-	\Huge \textcolor{SchoolColor}{\thetitle} \normalsize \\
-	\vspace{72pt}
+	\vspace{36pt}
+	\Large \textcolor{SchoolColor}{\thetitle} \normalsize \\
+	\vspace{36pt}
 	\textsc{A Dissertation submitted in partial satisfaction \\
 	of the requirements for the degree \\ 
 	of \\
@@ -50,9 +51,9 @@
 	\theauthor\\
     \vspace{24pt}
     Committee in charge \\
-    Professor Arturo A. Keller, Chair \\
     Associate Professor James Frew \\
     Associate Professor Roland Geyer \\
+    Professor Arturo A. Keller, Chair \\
     \vspace{24pt}
     \@degreemonth\ \@degreeyear }
 	\vspace*{\fill}
@@ -65,36 +66,40 @@
     \vspace*{\fill}
     \vspace{30pt}
     \begin{center}
-    \textsc{This Dissertation is Approved \\ by \\
+    \doublespacing
+    \pagenumbering{roman}
+   \textsc{This Dissertation is Approved \\ by \\
     \vspace{24pt}
-	Committee Chair \\
-	\vspace{24pt}
-	Signature:\noindent\rule{8cm}{1pt} Date: \noindent\rule{2cm}{1pt} \\
-	Dr. Arturo A. Keller \\
-    \vspace{24pt}
-	Committee Member \\
-	\vspace{24pt}
-    Signature: \noindent\rule{8cm}{1pt} Date: \noindent\rule{2cm}{1pt} \\
+    Signature: \noindent\rule{10cm}{1pt}\\
     Dr. James Frew \\
     \vspace{24pt}
-    Committee Member \\
+    Signature: \noindent\rule{10cm}{1pt} \\
+    Dr. Roland Geyer \\
     \vspace{24pt}
-    Signature: \noindent\rule{8cm}{1pt} Date: \noindent\rule{2cm}{1pt} \\
-    Dr. Roland Geyer \\}
+    Signature:\noindent\rule{10cm}{1pt} \\
+	 Dr. Arturo A. Keller, Committee Chair \\
+	 \vspace{24pt}
+    \@degreemonth\ \@degreeyear}
+    \end{center}
     \vspace*{\fill}
-	\end{center} 
 	\rm
 }
 
 \newcommand{\copyrightpage}{
 	\newpage
-    \pagenumbering{roman}
-	\setcounter{page}{3}
-	\thispagestyle{empty}
+	\begin{center}
+	\doublespacing
+	\thispagestyle{plain}
+	\pagenumbering{roman}
+	\setcounter{page}{1}
 	\vspace*{\fill}
-	\scshape \noindent \small \copyright \small 2015\hspace{3pt}-- \theauthor \\
-	\noindent All rights reserved. \\
+	\Large \textcolor{SchoolColor}{\thetitle} \normalsize \\
+	\vspace{24pt}
+	Copyright \scshape \noindent \small \copyright \small \@degreeyear\hspace{3pt} \\
+	by \\
+	\theauthor \\
 	\vspace*{\fill}
+	\end{center}
 	\newpage
 	\rm
 }
@@ -102,20 +107,26 @@
 \newcommand{\dedicationpage}{
 	\newpage 
 	\pagenumbering{roman}
-	\thispagestyle{empty} \vspace*{\fill}
+    \setcounter{page}{2}
+	\begin{center}
+	\doublespacing
+	\thispagestyle{plain} \vspace*{\fill}
 	\scshape \noindent \input{frontmatter/dedication}
-	\vspace*{\fill} 
+	\vspace*{\fill}
+	\end{center}
 	\newpage 
 	\rm
 }
 
 \newcommand{\vitaepage}{
     \newpage
+    \thispagestyle{plain}
     \pagenumbering{roman}
-    \thispagestyle{empty} 
+    \setcounter{page}{3}
     \begin{center}
     \Large \textcolor{SchoolColor}{Curriculum Vitae of Eric Daniel Fournier} \\
-    \normalsize June 2015 \\
+    \vspace*{12pt}
+    \normalsize \@degreemonth\ \@degreeyear \\
     \end{center}
     \vspace*{12pt}
     \Large \textcolor{SchoolColor}{Education} \\
@@ -125,7 +136,7 @@
     Master of Environmental Science, Yale School of Forestry and Environmental Science, New Haven, CT, June 2010 \\
     Master of Arts in Geography, University of California Santa Barbara, Santa Barbara, CA, March 2015 \\
     \vspace*{12pt}
-    \Large \textcolor{SchoolColor}{Employment} \\
+    \normalsize \textcolor{SchoolColor}{Employment} \\
     \vspace*{12pt}
     \normalsize
     2009-2010: Teaching Assistant, Geographic Information Science, Yale School of Forestry and Environmental Science, New Haven, CT \\
@@ -152,15 +163,19 @@
 }
 
 \newcommand{\abstractpage}{
+    \doublespacing
 	\newpage
     \pagenumbering{roman}
-	\pagestyle{fancy}
+    \setcounter{page}{4}
+	\pagestyle{plain}
 	\renewcommand{\headrulewidth}{0.0pt}
-	\vspace*{35pt}
 	\begin{center}
-	\Large \textcolor{SchoolColor}{\@title} \normalsize \\
-	\vspace*{20pt}
-	\scshape Abstract \\ \rm
+    \Large \scshape Abstract \\
+    \vspace{24pt}
+	\normalsize \textcolor{SchoolColor}{\@title} \normalsize \\
+	by \\
+	\theauthor 
+	\vspace*{12pt}
 	\end{center}
 	\input{frontmatter/abstract}
 	\vspace*{\fill}

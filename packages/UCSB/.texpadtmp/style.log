@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.1415926-2.4-0.9998 (TeX Live 2012) (format=xelatex 2012.6.30)  2 JUL 2015 10:27
+This is XeTeX, Version 3.1415926-2.4-0.9998 (TeX Live 2012) (format=xelatex 2012.6.30)  18 AUG 2015 11:12
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -340,8 +340,8 @@ If that doesn't work, type  X <return>  to quit.
  
 Here is how much of TeX's memory you used:
  29 strings out of 494004
- 386 string characters out of 3150890
- 49109 words of memory out of 3000000
+ 395 string characters out of 3150890
+ 49188 words of memory out of 3000000
  3390 multiletter control sequences out of 15000+200000
  3640 words of font info for 14 fonts, out of 3000000 for 9000
  1144 hyphenation exceptions out of 8191

@@ -55,7 +55,7 @@
 \RequirePackage{lettrine}
 \RequirePackage[super,comma,numbers]{natbib}
 \renewcommand{\bibnumfmt}[1]{[#1]}
-\RequirePackage[width=5.75in, letterpaper]{geometry}
+\RequirePackage[width=5.75in, height=8.5in, letterpaper]{geometry}
 \RequirePackage{fancyhdr}
 
 
