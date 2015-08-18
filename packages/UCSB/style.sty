@@ -111,6 +111,8 @@
 	\begin{center}
 	\doublespacing
 	\thispagestyle{plain} \vspace*{\fill}
+	\Large \scshape Dedications \normalsize \\
+    \vspace{24pt}
 	\scshape \noindent \input{frontmatter/dedication}
 	\vspace*{\fill}
 	\end{center}
@@ -118,11 +120,28 @@
 	\rm
 }
 
+\newcommand{\acknowledgments}{
+    \newpage
+	\pagenumbering{roman}
+    \setcounter{page}{3}
+	\begin{center}
+	\doublespacing
+	\thispagestyle{plain} \vspace*{\fill}
+    \Large \scshape Acknowledgements \normalsize \\
+    \vspace{24pt}
+	\noindent
+	\input{frontmatter/thanks}
+	\end{center}
+	\vspace*{\fill} 
+	\newpage
+}
+
+
 \newcommand{\vitaepage}{
     \newpage
     \thispagestyle{plain}
     \pagenumbering{roman}
-    \setcounter{page}{3}
+    \setcounter{page}{4}
     \begin{center}
     \Large \textcolor{SchoolColor}{Curriculum Vitae of Eric Daniel Fournier} \\
     \vspace*{12pt}
@@ -166,8 +185,8 @@
     \doublespacing
 	\newpage
     \pagenumbering{roman}
-    \setcounter{page}{4}
-	\pagestyle{plain}
+    \setcounter{page}{5}
+	\pagestyle{plain} \vspace*{\fill}
 	\renewcommand{\headrulewidth}{0.0pt}
 	\begin{center}
     \Large \scshape Abstract \\
@@ -181,13 +200,4 @@
 	\vspace*{\fill}
 	\newpage \lhead{} \rhead{}
 	\cfoot{\thepage}
-}
-
-\newcommand{\acknowledgments}{
-	\chapter*{Acknowledgments}
-	\noindent
-	\input{frontmatter/thanks}
-	\vspace*{\fill} \newpage
-	\setcounter{page}{1}
-	\pagenumbering{arabic}
 }
