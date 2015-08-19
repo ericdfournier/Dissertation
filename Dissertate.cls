@@ -102,8 +102,8 @@
 \setsansfont[Scale=MatchLowercase, BoldFont={Lato Bold}]{Lato Regular}
 \setmonofont[Scale=MatchLowercase]{Source Code Pro}
 
-\RequirePackage[labelfont={bf,sf,footnotesize,singlespacing},
-								textfont={sf,footnotesize,singlespacing},
+\RequirePackage[labelfont={bf,sf,small,singlespacing},
+								textfont={sf,small,singlespacing},
 								justification={justified,RaggedRight},
 								singlelinecheck=false,
 								margin=0pt,
