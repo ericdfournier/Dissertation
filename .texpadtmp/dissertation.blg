@@ -1,0 +1,72 @@
+This is BibTeX, Version 0.99d (TeX Live 2015)
+Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
+The top-level auxiliary file: dissertation.aux
+A level-1 auxiliary file: chapters/introduction.aux
+A level-1 auxiliary file: chapters/chapter1.aux
+A level-1 auxiliary file: chapters/chapter2.aux
+A level-1 auxiliary file: chapters/chapter3.aux
+A level-1 auxiliary file: chapters/chapter4.aux
+A level-1 auxiliary file: chapters/appendixA.aux
+The style file: apalike2.bst
+A level-1 auxiliary file: endmatter/colophon.aux
+Database file #1: ../references.bib
+Repeated entry---line 537 of file ../references.bib
+ : @techreport{CDHS2001
+ :                     ,
+I'm skipping whatever remains of this entry
+Repeated entry---line 2432 of file ../references.bib
+ : @book{NRC2008
+ :              ,
+I'm skipping whatever remains of this entry
+Warning--I didn't find a database entry for "Malczewski1999"
+Warning--I didn't find a database entry for "Malczewski2004"
+Warning--empty institution in Association2011
+Warning--can't use both author and editor fields in Coello2007
+Warning--empty journal in Coello2001
+Warning--can't use both author and editor fields in NRC2008
+Warning--can't use both author and editor fields in Deb2001
+Warning--can't use both author and editor fields in Deb2014
+Warning--can't use both author and editor fields in Goldberg1989
+Warning--there's a number but no volume in Stokes2011
+You've used 88 entries,
+            2229 wiz_defined-function locations,
+            1126 strings with 20304 characters,
+and the built_in function-call counts, 33405 in all, are:
+= -- 3300
+> -- 1297
+< -- 68
++ -- 425
+- -- 425
+* -- 2909
+:= -- 5892
+add.period$ -- 265
+call.type$ -- 88
+change.case$ -- 631
+chr.to.int$ -- 88
+cite$ -- 96
+duplicate$ -- 1259
+empty$ -- 2349
+format.name$ -- 557
+if$ -- 6440
+int.to.chr$ -- 1
+int.to.str$ -- 0
+missing$ -- 90
+newline$ -- 442
+num.names$ -- 267
+pop$ -- 527
+preamble$ -- 1
+purify$ -- 652
+quote$ -- 0
+skip$ -- 924
+stack$ -- 0
+substring$ -- 2328
+swap$ -- 135
+text.length$ -- 14
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 492
+warning$ -- 8
+while$ -- 285
+width$ -- 0
+write$ -- 1150
+(There were 2 error messages)

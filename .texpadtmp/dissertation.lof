@@ -1,0 +1,101 @@
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {1}{\ignorespaces Perspectives on the Energy-Water Nexus}}{5}{figure.caption.3}
+\contentsline {figure}{\numberline {2}{\ignorespaces Dimensions of the Energy-Water Nexus}}{6}{figure.caption.4}
+\contentsline {figure}{\numberline {3}{\ignorespaces Characteristics of Water Distribution Infrastructure}}{7}{figure.caption.5}
+\contentsline {figure}{\numberline {4}{\ignorespaces Energy Intensity of Water Distribution Infrastructure}}{8}{figure.caption.6}
+\contentsline {figure}{\numberline {5}{\ignorespaces Process Flow Diagram of Wastewater Treatment Methods}}{10}{figure.caption.7}
+\contentsline {figure}{\numberline {6}{\ignorespaces Appropriate End Use Categories for Different Levels of Treated Wastewater}}{11}{figure.caption.8}
+\contentsline {figure}{\numberline {7}{\ignorespaces Water Intensity of Energy Production}}{14}{figure.caption.9}
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {1.1}{\ignorespaces Conceptual illustration of the input data preprocessing operations and workflow phases typical to most MCSS analyses\relax }}{20}{figure.caption.10}
+\contentsline {figure}{\numberline {1.2}{\ignorespaces Control logic for MCSS input data preprocessing workflow.\relax }}{21}{figure.caption.11}
+\contentsline {figure}{\numberline {1.3}{\ignorespaces Directory tree structure for the toolset repository. Filetypes required for input data and automatically generated as output data are shown.\relax }}{22}{figure.caption.12}
+\contentsline {figure}{\numberline {1.4}{\ignorespaces Table of input data sources used in the case study MCSS model for artificial groundwater recharge applications.\relax }}{24}{figure.caption.13}
+\contentsline {figure}{\numberline {1.5}{\ignorespaces An overview of Step \#1 in the GUI based workflow: parameterizing the reference grid.\relax }}{26}{figure.caption.14}
+\contentsline {figure}{\numberline {1.6}{\ignorespaces An overview of Step \#2 in the GUI based workflow: selecting the reference polygon from the overlay shapefile geometry.\relax }}{27}{figure.caption.15}
+\contentsline {figure}{\numberline {1.7}{\ignorespaces An overview of Step \#3 in the GUI based workflow: selecting the reference polygon from the overlay shapefile geometry.\relax }}{28}{figure.caption.16}
+\contentsline {figure}{\numberline {1.8}{\ignorespaces Graphical Illustration of the WOSS Model Outputs for Reference HUC-10 Boundary\relax }}{29}{figure.caption.17}
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {2.1}{\ignorespaces MOGADOR Algorithm Pseudocode.\relax }}{37}{figure.caption.18}
+\contentsline {figure}{\numberline {2.2}{\ignorespaces MOGADOR Algorithm Data Structure}}{38}{figure.caption.19}
+\contentsline {figure}{\numberline {2.3}{\ignorespaces Pseudo-Random Walk Algorithm Pseudocode\relax }}{40}{figure.caption.20}
+\contentsline {figure}{\numberline {2.4}{\ignorespaces Pseudo-Random Walk Example}}{42}{figure.caption.21}
+\contentsline {figure}{\numberline {2.5}{\ignorespaces Conceptual Illustration of a Multi-Part Pseudo-Random Walk}}{44}{figure.caption.22}
+\contentsline {figure}{\numberline {2.6}{\ignorespaces Conceptual Illustration of a Convex Multi-Part Pseudo-Random Walk}}{46}{figure.caption.23}
+\contentsline {figure}{\numberline {2.7}{\ignorespaces Observing the Role of the Fixed Parameter $q$ in Determining Individual Path Randomness}}{48}{figure.caption.24}
+\contentsline {figure}{\numberline {2.8}{\ignorespaces Observing the Role of Problem Size on Initialization Runtime}}{48}{figure.caption.25}
+\contentsline {figure}{\numberline {2.9}{\ignorespaces Observing the Characteristics of Multi-Part Pseudo-Random Walks}}{50}{figure.caption.26}
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {3.1}{\ignorespaces WWEST Model System Boundaries\relax }}{59}{figure.caption.27}
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {4.1}{\ignorespaces Santa Barbara Region Overview\relax }}{69}{figure.caption.28}
+\contentsline {figure}{\numberline {4.2}{\ignorespaces Santa Barbara Region Search Domain\relax }}{70}{figure.caption.29}
+\contentsline {figure}{\numberline {4.3}{\ignorespaces Santa Barbara Region Destination Search Inputs: Slope Scores\relax }}{71}{figure.caption.30}
+\contentsline {figure}{\numberline {4.4}{\ignorespaces Santa Barbara Region Destination Search Inputs: Geology Scores\relax }}{71}{figure.caption.31}
+\contentsline {figure}{\numberline {4.5}{\ignorespaces Santa Barbara Region Destination Search Inputs: Landuse Scores\relax }}{72}{figure.caption.32}
+\contentsline {figure}{\numberline {4.6}{\ignorespaces Santa Barbara Region Destination Search Outputs: Composite Scores\relax }}{72}{figure.caption.33}
+\contentsline {figure}{\numberline {4.7}{\ignorespaces Santa Barbara Region Destination Search Outputs: Candidate Regions\relax }}{73}{figure.caption.34}
+\contentsline {figure}{\numberline {4.8}{\ignorespaces Santa Barbara Region Proposed Corridor Endpoints\relax }}{73}{figure.caption.35}
+\contentsline {figure}{\numberline {4.9}{\ignorespaces Santa Barbara Region Accessibility Based Objective Scores\relax }}{75}{figure.caption.36}
+\contentsline {figure}{\numberline {4.10}{\ignorespaces Santa Barbara Region Land Use Disturbance Based Objective Scores\relax }}{75}{figure.caption.37}
+\contentsline {figure}{\numberline {4.11}{\ignorespaces Santa Barbara Region Slope Based Objective Scores\relax }}{75}{figure.caption.38}
+\contentsline {figure}{\numberline {4.12}{\ignorespaces Santa Barbara Region Corridor Analysis Results\relax }}{77}{figure.caption.39}
+\contentsline {figure}{\numberline {4.13}{\ignorespaces Santa Barbara Region Top 100 Corridors Basin Wide Overview\relax }}{78}{figure.caption.40}
+\contentsline {figure}{\numberline {4.14}{\ignorespaces Santa Barbara Region Proposed Corridor Elevation Profile\relax }}{79}{figure.caption.41}
+\contentsline {figure}{\numberline {4.15}{\ignorespaces Oxnard Region Overview\relax }}{82}{figure.caption.42}
+\contentsline {figure}{\numberline {4.16}{\ignorespaces Oxnard Region Search Domain\relax }}{83}{figure.caption.43}
+\contentsline {figure}{\numberline {4.17}{\ignorespaces Oxnard Region Destination Search Inputs: Slope Scores\relax }}{83}{figure.caption.44}
+\contentsline {figure}{\numberline {4.18}{\ignorespaces Oxnard Region Destination Search Inputs: Geology Scores\relax }}{84}{figure.caption.45}
+\contentsline {figure}{\numberline {4.19}{\ignorespaces Oxnard Region Destination Search Inputs: Landuse Scores\relax }}{84}{figure.caption.46}
+\contentsline {figure}{\numberline {4.20}{\ignorespaces Oxnard Region Destination Search Outputs: Composite Scores\relax }}{85}{figure.caption.47}
+\contentsline {figure}{\numberline {4.21}{\ignorespaces Oxnard Region Destination Search Outputs: Candidate Regions\relax }}{85}{figure.caption.48}
+\contentsline {figure}{\numberline {4.22}{\ignorespaces Oxnard Region Proposed Corridor Endpoints\relax }}{86}{figure.caption.49}
+\contentsline {figure}{\numberline {4.23}{\ignorespaces Oxnard Region Accessibility Based Objective Scores\relax }}{87}{figure.caption.50}
+\contentsline {figure}{\numberline {4.24}{\ignorespaces Oxnard Region Land Use Based Disturbance Objective Scores\relax }}{87}{figure.caption.51}
+\contentsline {figure}{\numberline {4.25}{\ignorespaces Oxnard Region Slope Based Objective Scores\relax }}{88}{figure.caption.52}
+\contentsline {figure}{\numberline {4.26}{\ignorespaces Oxnard Region Corridor Analysis Results\relax }}{89}{figure.caption.53}
+\contentsline {figure}{\numberline {4.27}{\ignorespaces Oxnard Region Top 100 Corridors Basin Wide Overview\relax }}{89}{figure.caption.54}
+\contentsline {figure}{\numberline {4.28}{\ignorespaces Oxnard Region Proposed Corridor Elevation Profile\relax }}{90}{figure.caption.55}
+\contentsline {figure}{\numberline {4.29}{\ignorespaces San Diego Region Overview\relax }}{93}{figure.caption.56}
+\contentsline {figure}{\numberline {4.30}{\ignorespaces San Diego Region Search Domain\relax }}{94}{figure.caption.57}
+\contentsline {figure}{\numberline {4.31}{\ignorespaces San Diego Region Proposed Corridor Endpoints\relax }}{95}{figure.caption.58}
+\contentsline {figure}{\numberline {4.32}{\ignorespaces San Diego Region Accessibility Based Objective Scores\relax }}{96}{figure.caption.59}
+\contentsline {figure}{\numberline {4.33}{\ignorespaces San Diego Region Land Use Disturbance Based Objective Scores\relax }}{97}{figure.caption.60}
+\contentsline {figure}{\numberline {4.34}{\ignorespaces San Diego Region Slope Based Objective Scores\relax }}{98}{figure.caption.61}
+\contentsline {figure}{\numberline {4.35}{\ignorespaces San Diego Region Corridor Analysis Results\relax }}{99}{figure.caption.62}
+\contentsline {figure}{\numberline {4.36}{\ignorespaces San Diego Region Top 100 Corridors Basin Wide Overview\relax }}{100}{figure.caption.63}
+\contentsline {figure}{\numberline {4.37}{\ignorespaces Santa Diego Region Proposed Corridor Elevation Profile\relax }}{101}{figure.caption.64}
+\contentsline {figure}{\numberline {4.38}{\ignorespaces Santa Ana -- San Bernadino Region Overview\relax }}{103}{figure.caption.65}
+\contentsline {figure}{\numberline {4.39}{\ignorespaces Santa Ana -- San Bernadino Region Search Domain\relax }}{104}{figure.caption.66}
+\contentsline {figure}{\numberline {4.40}{\ignorespaces Santa Ana -- San Bernadino Region Destination Search Inputs: Slope Scores\relax }}{105}{figure.caption.67}
+\contentsline {figure}{\numberline {4.41}{\ignorespaces Santa Ana -- San Bernadino Region Destination Search Inputs: Geology Scores\relax }}{105}{figure.caption.68}
+\contentsline {figure}{\numberline {4.42}{\ignorespaces Santa Ana -- San Bernadino Region Destination Search Inputs: Landuse Scores\relax }}{106}{figure.caption.69}
+\contentsline {figure}{\numberline {4.43}{\ignorespaces Santa Ana -- San Bernadino Region Destination Search Outputs: Composite Scores\relax }}{107}{figure.caption.70}
+\contentsline {figure}{\numberline {4.44}{\ignorespaces Santa Ana -- San Bernadino Region Destination Search Outputs: Candidate Regions\relax }}{107}{figure.caption.71}
+\contentsline {figure}{\numberline {4.45}{\ignorespaces Santa Ana -- San Bernadino Region Proposed Corridor Endpoints\relax }}{108}{figure.caption.72}
+\contentsline {figure}{\numberline {4.46}{\ignorespaces Santa Ana -- San Bernadino Region Accessibility Based Objective Scores\relax }}{109}{figure.caption.73}
+\contentsline {figure}{\numberline {4.47}{\ignorespaces Santa Ana -- San Bernadino Region Land Use Disturbance Based Objective Scores\relax }}{109}{figure.caption.74}
+\contentsline {figure}{\numberline {4.48}{\ignorespaces Santa Ana -- San Bernadino Region Slope Based Objective Scores\relax }}{110}{figure.caption.75}
+\contentsline {figure}{\numberline {4.49}{\ignorespaces Santa Ana -- San Bernadino Region Corridor Analysis Results\relax }}{111}{figure.caption.76}
+\contentsline {figure}{\numberline {4.50}{\ignorespaces Santa Ana -- San Bernadino Region Top 100 Corridors Basin Wide Overview\relax }}{112}{figure.caption.77}
+\contentsline {figure}{\numberline {4.51}{\ignorespaces San Bernadino Region Proposed Corridor Elevation Profile\relax }}{112}{figure.caption.78}
+\contentsline {figure}{\numberline {4.52}{\ignorespaces Fresno -- Tulare Region Overview\relax }}{114}{figure.caption.79}
+\contentsline {figure}{\numberline {4.53}{\ignorespaces Fresno -- Tulare Region Search Domain\relax }}{115}{figure.caption.80}
+\contentsline {figure}{\numberline {4.54}{\ignorespaces Fresno -- Tulare Region Destination Search Inputs: Slope Scores\relax }}{116}{figure.caption.81}
+\contentsline {figure}{\numberline {4.55}{\ignorespaces Fresno -- Tulare Region Destination Search Inputs: Geology Scores\relax }}{116}{figure.caption.82}
+\contentsline {figure}{\numberline {4.56}{\ignorespaces Fresno -- Tulare Region Destination Search Inputs: Landuse Scores\relax }}{117}{figure.caption.83}
+\contentsline {figure}{\numberline {4.57}{\ignorespaces Fresno -- Tulare Region Destination Search Outputs: Composite Scores\relax }}{118}{figure.caption.84}
+\contentsline {figure}{\numberline {4.58}{\ignorespaces Fresno -- Tulare Region Destination Search Outputs: Candidate Regions\relax }}{119}{figure.caption.85}
+\contentsline {figure}{\numberline {4.59}{\ignorespaces Fresno -- Tulare Region Proposed Corridor Endpoints\relax }}{120}{figure.caption.86}
+\contentsline {figure}{\numberline {4.60}{\ignorespaces Fresno -- Tulare Region Accessibility Based Objective Scores\relax }}{121}{figure.caption.87}
+\contentsline {figure}{\numberline {4.61}{\ignorespaces Fresno -- Tulare Region Land Use Disturbance Based Objective Scores\relax }}{122}{figure.caption.88}
+\contentsline {figure}{\numberline {4.62}{\ignorespaces Fresno -- Tulare Region Slope Based Objective Scores\relax }}{123}{figure.caption.89}
+\contentsline {figure}{\numberline {4.63}{\ignorespaces Fresno Region Corridor Analysis Results\relax }}{124}{figure.caption.90}
+\contentsline {figure}{\numberline {4.64}{\ignorespaces Fresno Region Top 100 Corridors Basin Wide Overview\relax }}{125}{figure.caption.91}
+\contentsline {figure}{\numberline {4.65}{\ignorespaces Fresno Region Proposed Corridor Elevation Profile\relax }}{126}{figure.caption.92}
+\contentsline {figure}{\numberline {4.66}{\ignorespaces Algorithm Runtime Performance for Each of the Five Case Study Regions for Three Population Sizes\relax }}{128}{figure.caption.93}
+\contentsline {figure}{\numberline {4.67}{\ignorespaces Algorithm Convergence Rates for Each of the Five Case Study Regions for Three Population Sizes\relax }}{129}{figure.caption.94}
+\contentsline {figure}{\numberline {4.68}{\ignorespaces Comparison of the Along Path Distance and Cumulative Objective Scores between the Solution Corridors and the Euclidean Shortest Corridors\relax }}{130}{figure.caption.95}
+\contentsline {figure}{\numberline {4.69}{\ignorespaces Comparison of the Along Corridor Elevation Profiles for each of the Solution Corridors\relax }}{131}{figure.caption.96}
+\contentsline {figure}{\numberline {4.70}{\ignorespaces Comparison of the Net Water Usage Efficiencies of Reuse for each of the Case Study Regions Measured in Terms of Both the Withdrawals and Consumption of Water for the Production of Energy Required for Reuse\relax }}{134}{figure.caption.97}
+\addvspace {10\p@ }

@@ -1,0 +1,86 @@
+\contentsline {chapter}{\numberline {0}Introduction}{1}{chapter.0}
+\contentsline {section}{\numberline {0.1}Research Objectives}{2}{section.0.1}
+\contentsline {section}{\numberline {0.2}The Energy-Water Nexus}{3}{section.0.2}
+\contentsline {section}{\numberline {0.3}Water Distribution Systems}{6}{section.0.3}
+\contentsline {section}{\numberline {0.4}Wastewater Treatment}{8}{section.0.4}
+\contentsline {section}{\numberline {0.5}Wastewater Recycling and Reuse}{10}{section.0.5}
+\contentsline {section}{\numberline {0.6}The Energy-Water Feedback Loop}{13}{section.0.6}
+\contentsline {chapter}{\numberline {1}Selecting Suitable Sites}{16}{chapter.1}
+\contentsline {section}{\numberline {1.1}Selecting Suitable Sites for Artificial Groundwater Recharge Basins}{17}{section.1.1}
+\contentsline {section}{\numberline {1.2}Multi-Criteria Site Suitability Analyses}{17}{section.1.2}
+\contentsline {section}{\numberline {1.3}The MCSS Data Preprocessing Workflow}{18}{section.1.3}
+\contentsline {section}{\numberline {1.4}The MCSS Computational Workflow}{19}{section.1.4}
+\contentsline {section}{\numberline {1.5}The Software Toolset Repository Architecture}{21}{section.1.5}
+\contentsline {section}{\numberline {1.6}An Example Implementation}{23}{section.1.6}
+\contentsline {section}{\numberline {1.7}The Geographic Unit of Analysis}{23}{section.1.7}
+\contentsline {section}{\numberline {1.8}Graphical User Interface}{25}{section.1.8}
+\contentsline {section}{\numberline {1.9}The WOSS Model Outputs}{28}{section.1.9}
+\contentsline {chapter}{\numberline {2}Locating Optimal Corridors}{31}{chapter.2}
+\contentsline {section}{\numberline {2.1}Locating Optimal Corridors for Water Distribution Infrastructure}{32}{section.2.1}
+\contentsline {section}{\numberline {2.2}The Multi-Objective Corridor Location Problem}{33}{section.2.2}
+\contentsline {section}{\numberline {2.3}Genetic Algorithms}{34}{section.2.3}
+\contentsline {section}{\numberline {2.4}The MOGADOR Algorithm}{35}{section.2.4}
+\contentsline {section}{\numberline {2.5}The MOGADOR Data Structure}{37}{section.2.5}
+\contentsline {section}{\numberline {2.6}Initializing the MOGADOR Algorithm}{38}{section.2.6}
+\contentsline {section}{\numberline {2.7}An Example Pseudo-Random Walk}{41}{section.2.7}
+\contentsline {section}{\numberline {2.8}Initializing Problems with Large Decisions Spaces}{43}{section.2.8}
+\contentsline {section}{\numberline {2.9}Initializing Problems with Concave Decision Spaces}{45}{section.2.9}
+\contentsline {section}{\numberline {2.10}Measuring Initialization Performance}{46}{section.2.10}
+\contentsline {section}{\numberline {2.11}The MOGADOR Algorithm Outputs}{50}{section.2.11}
+\contentsline {chapter}{\numberline {3}Quantifying Life-Cycle Energy-Water Resource Utilization}{51}{chapter.3}
+\contentsline {section}{\numberline {3.1}Quantifying Life-Cycle Energy-Water Resource Usage Efficiency}{52}{section.3.1}
+\contentsline {section}{\numberline {3.2}Life Cycle Assessment and Inventory Modeling}{52}{section.3.2}
+\contentsline {section}{\numberline {3.3}Wastewater Treatment Processes}{54}{section.3.3}
+\contentsline {section}{\numberline {3.4}Water Distribution Infrastructure}{56}{section.3.4}
+\contentsline {section}{\numberline {3.5}WWEST Recycled Water Reuse Life Cycle Inventory Model}{58}{section.3.5}
+\contentsline {section}{\numberline {3.6}Parameterizing Pump Energy Requirements}{59}{section.3.6}
+\contentsline {section}{\numberline {3.7}Parameterizing Construction Material Requirements}{64}{section.3.7}
+\contentsline {section}{\numberline {3.8}Parameterizing Chemical Consumption Rates}{65}{section.3.8}
+\contentsline {section}{\numberline {3.9}Estimating Net Water Usage Efficiency}{65}{section.3.9}
+\contentsline {section}{\numberline {3.10}The WWEST Model Outputs}{66}{section.3.10}
+\contentsline {chapter}{\numberline {4}Case Study Results}{67}{chapter.4}
+\contentsline {section}{\numberline {4.1}Santa Barbara Region}{68}{section.4.1}
+\contentsline {subsection}{\numberline {4.1.1}Regional Context}{69}{subsection.4.1.1}
+\contentsline {subsection}{\numberline {4.1.2}Search Domain}{69}{subsection.4.1.2}
+\contentsline {subsection}{\numberline {4.1.3}Destination Search Inputs}{70}{subsection.4.1.3}
+\contentsline {subsection}{\numberline {4.1.4}Destination Search Outputs}{71}{subsection.4.1.4}
+\contentsline {subsection}{\numberline {4.1.5}Proposed Corridor Endpoints}{72}{subsection.4.1.5}
+\contentsline {subsection}{\numberline {4.1.6}Proposed Objective Layers}{73}{subsection.4.1.6}
+\contentsline {subsection}{\numberline {4.1.7}Proposed Corridor Solutions}{75}{subsection.4.1.7}
+\contentsline {subsection}{\numberline {4.1.8}Along-Corridor Elevation Profile}{77}{subsection.4.1.8}
+\contentsline {section}{\numberline {4.2}Oxnard Region}{80}{section.4.2}
+\contentsline {subsection}{\numberline {4.2.1}Regional Context}{81}{subsection.4.2.1}
+\contentsline {subsection}{\numberline {4.2.2}Search Domain}{82}{subsection.4.2.2}
+\contentsline {subsection}{\numberline {4.2.3}Destination Search Inputs}{83}{subsection.4.2.3}
+\contentsline {subsection}{\numberline {4.2.4}Destination Search Outputs}{84}{subsection.4.2.4}
+\contentsline {subsection}{\numberline {4.2.5}Proposed Corridor Endpoints}{85}{subsection.4.2.5}
+\contentsline {subsection}{\numberline {4.2.6}Proposed Objective Layers}{86}{subsection.4.2.6}
+\contentsline {subsection}{\numberline {4.2.7}Proposed Corridor Solutions}{86}{subsection.4.2.7}
+\contentsline {section}{\numberline {4.3}San Diego Region}{91}{section.4.3}
+\contentsline {subsection}{\numberline {4.3.1}Regional Context}{92}{subsection.4.3.1}
+\contentsline {subsection}{\numberline {4.3.2}Search Domain}{92}{subsection.4.3.2}
+\contentsline {subsection}{\numberline {4.3.3}Proposed Corridor Endpoints}{92}{subsection.4.3.3}
+\contentsline {subsection}{\numberline {4.3.4}Proposed Objective Layers}{93}{subsection.4.3.4}
+\contentsline {subsection}{\numberline {4.3.5}Proposed Corridor Solutions}{94}{subsection.4.3.5}
+\contentsline {section}{\numberline {4.4}Santa Ana -- San Bernadino Region}{102}{section.4.4}
+\contentsline {subsection}{\numberline {4.4.1}Regional Context}{103}{subsection.4.4.1}
+\contentsline {subsection}{\numberline {4.4.2}Search Domain}{104}{subsection.4.4.2}
+\contentsline {subsection}{\numberline {4.4.3}Destination Search Inputs}{104}{subsection.4.4.3}
+\contentsline {subsection}{\numberline {4.4.4}Destination Search Outputs}{106}{subsection.4.4.4}
+\contentsline {subsection}{\numberline {4.4.5}Proposed Corridor Endpoints}{106}{subsection.4.4.5}
+\contentsline {subsection}{\numberline {4.4.6}Proposed Objective Layers}{108}{subsection.4.4.6}
+\contentsline {subsection}{\numberline {4.4.7}Proposed Corridor Solutions}{108}{subsection.4.4.7}
+\contentsline {section}{\numberline {4.5}Fresno -- Tulare Region}{113}{section.4.5}
+\contentsline {subsection}{\numberline {4.5.1}Regional Context}{114}{subsection.4.5.1}
+\contentsline {subsection}{\numberline {4.5.2}Search Domain}{114}{subsection.4.5.2}
+\contentsline {subsection}{\numberline {4.5.3}Destination Search Inputs}{115}{subsection.4.5.3}
+\contentsline {subsection}{\numberline {4.5.4}Destination Search Outputs}{117}{subsection.4.5.4}
+\contentsline {subsection}{\numberline {4.5.5}Proposed Corridor Endpoints}{117}{subsection.4.5.5}
+\contentsline {subsection}{\numberline {4.5.6}Proposed Objective Layers}{118}{subsection.4.5.6}
+\contentsline {subsection}{\numberline {4.5.7}Proposed Corridor Solutions}{119}{subsection.4.5.7}
+\contentsline {section}{\numberline {4.6}Evaluating the MOGADOR Algorithm's Runtime Performance}{127}{section.4.6}
+\contentsline {section}{\numberline {4.7}Evaluating the MOGADOR Algorithm's Solution Quality}{127}{section.4.7}
+\contentsline {section}{\numberline {4.8}Evaluating the MOGADOR Algorithm's Solution Elevation Profiles}{131}{section.4.8}
+\contentsline {section}{\numberline {4.9}Evaluating the Life-Cycle Water-Energy Usage Efficiencies of Proposed Reuse Systems}{132}{section.4.9}
+\contentsline {chapter}{Appendix \numberline {A}}{135}{Appendix.1.A}
+\contentsline {chapter}{References}{273}{chapter*.98}
